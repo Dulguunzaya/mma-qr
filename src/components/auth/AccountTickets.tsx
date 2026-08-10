@@ -78,7 +78,7 @@ export function AccountTickets() {
   );
 
   return (
-    <section className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-5">
+    <section className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
       <h2 className="text-lg font-semibold text-neutral-800">
         {t("myTickets")}
       </h2>
@@ -107,12 +107,12 @@ export function AccountTickets() {
                     {slug ? (
                       <Link
                         href={`/events/${slug}`}
-                        className="block truncate text-sm font-semibold text-primary-700 transition-colors hover:text-accent-700"
+                        className="block line-clamp-2 text-sm font-semibold text-primary-700 transition-colors hover:text-accent-700 sm:truncate"
                       >
                         {title}
                       </Link>
                     ) : (
-                      <p className="truncate text-sm font-semibold text-primary-900">
+                      <p className="line-clamp-2 text-sm font-semibold text-primary-900 sm:truncate">
                         {title}
                       </p>
                     )}

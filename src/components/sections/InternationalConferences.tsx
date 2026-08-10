@@ -18,7 +18,7 @@ export default async function InternationalConferences({
 
   return (
     <section className="border-y border-neutral-200 bg-primary-50/50">
-      <div className="mx-auto max-w-[1200px] px-6 py-16 sm:py-24 lg:px-10">
+      <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10">
         <CmsSectionHeading
           slug="international-conferences"
           locale={locale}

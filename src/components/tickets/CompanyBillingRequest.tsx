@@ -278,11 +278,11 @@ export function printCompanyBillingRequest(
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] border-b border-neutral-200 last:border-b-0">
+    <div className="grid border-b border-neutral-200 last:border-b-0 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
       <dt className="bg-neutral-100/70 px-3 py-2.5 text-xs font-semibold leading-5 text-neutral-500 sm:px-4">
         {label}
       </dt>
-      <dd className="break-words px-3 py-2.5 text-right text-xs font-semibold leading-5 text-primary-900 sm:px-4">
+      <dd className="break-words px-3 py-2.5 text-xs font-semibold leading-5 text-primary-900 sm:px-4 sm:text-right">
         {value}
       </dd>
     </div>
@@ -309,7 +309,7 @@ export default function CompanyBillingRequest({
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
           <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
         </span>
-        <h3 className="mt-5 text-2xl font-semibold text-primary-900">
+        <h3 className="mt-5 [overflow-wrap:anywhere] text-xl font-semibold text-primary-900 sm:text-2xl">
           {t("companyBillingReadyHeading")}
         </h3>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-neutral-500">
@@ -324,10 +324,10 @@ export default function CompanyBillingRequest({
             alt={labels.issuerName}
             width={424}
             height={154}
-            className="h-auto w-[190px]"
+            className="h-auto w-[160px] sm:w-[190px]"
           />
           <div className="sm:max-w-xs sm:text-right">
-            <h4 className="text-xl font-semibold uppercase tracking-wide text-primary-900">
+            <h4 className="[overflow-wrap:anywhere] text-lg font-semibold uppercase tracking-wide text-primary-900 sm:text-xl">
               {labels.documentTitle}
             </h4>
             <p className="mt-2 text-xs leading-5 text-neutral-500">
@@ -338,7 +338,7 @@ export default function CompanyBillingRequest({
           </div>
         </header>
 
-        <div className="px-5 py-6 sm:px-7">
+        <div className="px-4 py-5 sm:px-7 sm:py-6">
           <h5 className="text-xs font-semibold uppercase tracking-[0.1em] text-primary-800">
             {labels.billingDetails}
           </h5>
@@ -388,7 +388,7 @@ export default function CompanyBillingRequest({
           <h5 className="mt-7 text-xs font-semibold uppercase tracking-[0.1em] text-primary-800">
             {labels.lineItems}
           </h5>
-          <div className="mt-3 overflow-x-auto rounded-lg border border-neutral-200">
+          <div className="mt-3 overflow-x-auto rounded-lg border border-neutral-200" tabIndex={0}>
             <table className="min-w-[650px] table-fixed text-xs">
               <thead className="bg-primary-50 text-primary-800">
                 <tr>

@@ -31,7 +31,7 @@ export default async function Header({ locale }: { locale: string }) {
         {t("skipToContent")}
       </a>
       <header className="sticky top-0 z-40 border-b border-neutral-200 bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-6 lg:px-10">
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-10">
           <Link
             href="/"
             className="shrink-0 rounded-sm"

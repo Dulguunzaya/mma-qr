@@ -16,7 +16,7 @@ export function EducationCard({
 
   if (featured) {
     return (
-      <article className="group relative h-full min-h-80 overflow-hidden rounded-lg bg-primary-800 p-7 shadow-md sm:p-8">
+      <article className="group relative h-full min-h-72 overflow-hidden rounded-lg bg-primary-800 p-5 shadow-md sm:min-h-80 sm:p-8">
         <div
           aria-hidden="true"
           className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full border border-primary-600"
@@ -37,7 +37,7 @@ export function EducationCard({
               <GraduationCap className="h-5 w-5" aria-hidden="true" />
             </span>
           </div>
-          <h3 className="mt-12 max-w-md font-sans text-2xl font-semibold leading-tight text-white sm:text-3xl">
+          <h3 className="mt-10 max-w-md [overflow-wrap:anywhere] font-sans text-xl font-semibold leading-tight text-white sm:mt-12 sm:text-3xl">
             {post.title}
           </h3>
           {post.excerpt && (
@@ -45,7 +45,7 @@ export function EducationCard({
               {post.excerpt}
             </p>
           )}
-          <div className="mt-auto flex items-end justify-between gap-4 pt-10">
+          <div className="mt-auto flex flex-wrap items-end justify-between gap-4 pt-8 sm:pt-10">
             {audience ? (
               <span className="rounded-full border border-primary-500 px-3 py-1 font-sans text-[11px] uppercase tracking-wide text-primary-100">
                 {audience === "student" ? t("student") : t("professional")}

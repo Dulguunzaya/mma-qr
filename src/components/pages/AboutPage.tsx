@@ -225,14 +225,14 @@ export default async function AboutPage({
 
   return (
     <>
-      <div className="mx-auto max-w-[1200px] px-6 pt-12 sm:pt-16 lg:px-10">
+      <div className="mx-auto max-w-[1200px] px-4 pt-10 sm:px-6 sm:pt-16 lg:px-10">
         <div className="max-w-3xl">
-          <div className="flex items-center gap-6">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-6">
             <span
-              className="h-px w-16 shrink-0 bg-primary-500"
+              className="h-px w-8 shrink-0 bg-primary-500 sm:w-16"
               aria-hidden="true"
             />
-            <h1 className="text-2xl font-semibold uppercase leading-tight tracking-[0.14em] text-primary-800 sm:text-3xl">
+            <h1 className="min-w-0 [overflow-wrap:anywhere] text-xl font-semibold uppercase leading-tight tracking-[0.1em] text-primary-800 sm:text-3xl sm:tracking-[0.14em]">
               {page.name}
             </h1>
           </div>
@@ -242,7 +242,7 @@ export default async function AboutPage({
         </div>
       </div>
 
-      <section className="mx-auto max-w-[1200px] px-6 pb-14 pt-8 sm:pb-20 sm:pt-10 lg:px-10">
+      <section className="mx-auto max-w-[1200px] px-4 pb-14 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <SectionHeading
@@ -302,7 +302,7 @@ export default async function AboutPage({
 
       {directions.length > 0 && (
         <section className="border-y border-neutral-200 bg-neutral-100/50">
-          <div className="mx-auto max-w-[1200px] px-6 py-14 sm:py-20 lg:px-10">
+          <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20 lg:px-10">
             <SectionHeading
               label={getSubheader(directionsPage) ?? ""}
               title={directionsPage?.name ?? ""}
@@ -335,7 +335,7 @@ export default async function AboutPage({
 
       {history.length > 0 && (
         <section className="border-b border-neutral-200 bg-background">
-          <div className="mx-auto max-w-[1200px] px-6 py-14 sm:py-20 lg:px-10">
+          <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20 lg:px-10">
             <div className="grid gap-6 lg:grid-cols-[0.45fr_0.55fr] lg:items-end lg:gap-16">
               <SectionHeading
                 label={getSubheader(historyPage) ?? ""}
@@ -360,7 +360,7 @@ export default async function AboutPage({
                   {history.map((entry) => (
                     <li
                       key={entry._id}
-                      className="relative flex h-fit w-[min(82vw,360px)] shrink-0 snap-start flex-col rounded-lg border border-neutral-200 bg-white p-6 sm:w-[400px]"
+                      className="relative flex h-fit w-[min(84vw,360px)] shrink-0 snap-start flex-col rounded-lg border border-neutral-200 bg-white p-5 sm:w-[400px] sm:p-6"
                     >
                       <span
                         className="absolute -top-[29px] left-6 h-3 w-3 rounded-full border-2 border-neutral-50 bg-accent-500 ring-1 ring-accent-400"
@@ -385,7 +385,7 @@ export default async function AboutPage({
       {(presidentPeople.length > 0 || leadershipTeam.length > 0) && (
         <section
           id="leadership"
-          className="scroll-mt-24 mx-auto max-w-[1200px] px-6 py-14 sm:py-20 lg:px-10"
+          className="scroll-mt-24 mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20 lg:px-10"
         >
           <SectionHeading
             label={getSubheader(presidentsPage) ?? ""}
@@ -468,7 +468,7 @@ export default async function AboutPage({
 
       {managementPeople.length > 0 && (
         <section className="border-t border-neutral-200 bg-neutral-100/50">
-          <div className="mx-auto max-w-[1200px] px-6 py-14 sm:py-20 lg:px-10">
+          <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20 lg:px-10">
             <SectionHeading
               label={getSubheader(managementPage) ?? ""}
               title={managementPage?.name ?? ""}

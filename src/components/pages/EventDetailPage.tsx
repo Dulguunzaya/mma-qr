@@ -122,7 +122,7 @@ export default async function EventDetailPage({
 
   return (
     <article className="border-b border-neutral-200 bg-background">
-      <div className="mx-auto max-w-[1200px] px-6 py-10 sm:py-14 lg:px-10 lg:py-16">
+      <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-6 sm:py-14 lg:px-10 lg:py-16">
         <Link
           href="/events"
           className="group inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition-colors hover:text-accent-700"
@@ -140,11 +140,11 @@ export default async function EventDetailPage({
               <span className="h-px w-8 bg-accent-500" aria-hidden="true" />
               {t("eyebrow")}
             </p>
-            <h1 className="mt-4 max-w-3xl text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[1.06] tracking-tight text-primary-900">
+            <h1 className="mt-4 max-w-3xl [overflow-wrap:anywhere] text-[clamp(2rem,9vw,4rem)] font-semibold leading-[1.08] tracking-tight text-primary-900">
               {post.title}
             </h1>
             {post.excerpt && (
-              <p className="mt-5 max-w-3xl text-lg leading-8 text-neutral-600">
+              <p className="mt-5 max-w-3xl text-base leading-7 text-neutral-600 sm:text-lg sm:leading-8">
                 {post.excerpt}
               </p>
             )}

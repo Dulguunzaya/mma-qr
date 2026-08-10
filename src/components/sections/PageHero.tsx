@@ -8,7 +8,7 @@ interface PageHeroProps {
 
 export function PageHero({ title, eyebrow, description }: PageHeroProps) {
   return (
-    <div className="mx-auto max-w-[1200px] px-6 pt-12 sm:pt-16 lg:px-10">
+    <div className="mx-auto max-w-[1200px] px-4 pt-10 sm:px-6 sm:pt-16 lg:px-10">
       <div className="max-w-3xl">
         {eyebrow && (
           <p className="mb-4 flex items-center gap-3 font-sans text-xs font-medium uppercase tracking-[0.12em] text-accent-600">
@@ -16,12 +16,12 @@ export function PageHero({ title, eyebrow, description }: PageHeroProps) {
             {eyebrow}
           </p>
         )}
-        <div className="flex items-center gap-6">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-6">
           <span
-            className="h-px w-16 shrink-0 bg-primary-500"
+            className="h-px w-8 shrink-0 bg-primary-500 sm:w-16"
             aria-hidden="true"
           />
-          <h1 className="font-sans text-2xl font-semibold uppercase leading-tight tracking-[0.14em] text-primary-800 sm:text-3xl">
+          <h1 className="min-w-0 [overflow-wrap:anywhere] font-sans text-xl font-semibold uppercase leading-tight tracking-[0.1em] text-primary-800 sm:text-3xl sm:tracking-[0.14em]">
             {title}
           </h1>
         </div>

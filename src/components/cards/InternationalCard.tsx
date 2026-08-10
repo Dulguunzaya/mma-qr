@@ -44,7 +44,7 @@ export function InternationalCard({
   );
 
   const className =
-    "group block h-full bg-primary-800 p-6 transition-colors duration-200 hover:bg-primary-700 sm:p-7";
+    "group block h-full bg-primary-800 p-5 transition-colors duration-200 hover:bg-primary-700 sm:p-7";
 
   if (externalUrl) {
     return (

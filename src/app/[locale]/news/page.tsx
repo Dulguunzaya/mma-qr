@@ -47,7 +47,7 @@ export default async function NewsPage({
       />
       <section
         id="page-content"
-        className="mx-auto max-w-[1200px] scroll-mt-24 px-6 pb-14 pt-8 sm:pb-20 sm:pt-10 lg:px-10"
+        className="mx-auto max-w-[1200px] scroll-mt-24 px-4 pb-14 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:px-10"
       >
         <CmsSectionHeading slug="news-listing" locale={locale} />
         <NewsList posts={posts} />

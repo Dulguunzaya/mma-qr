@@ -441,7 +441,7 @@ export function TicketRepayment({
             role="dialog"
             aria-modal="true"
             aria-labelledby="ticket-repayment-title"
-            className="relative flex max-h-[96dvh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl bg-background shadow-2xl sm:rounded-xl"
+            className="relative flex max-h-[calc(100dvh-env(safe-area-inset-top))] w-full max-w-md flex-col overflow-hidden rounded-t-2xl bg-background pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[96dvh] sm:rounded-xl sm:pb-0"
           >
             <div className="flex items-start justify-between gap-6 border-b border-neutral-200 bg-white px-5 py-4">
               <div>

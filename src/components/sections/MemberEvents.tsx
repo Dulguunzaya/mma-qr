@@ -13,7 +13,7 @@ export default async function MemberEvents({ locale }: { locale: string }) {
 
   return (
     <section className="border-y border-accent-100 bg-accent-50/60">
-      <div className="mx-auto max-w-[1200px] px-6 py-16 sm:py-24 lg:px-10">
+      <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10">
         <CmsSectionHeading
           slug="member-events"
           locale={locale}

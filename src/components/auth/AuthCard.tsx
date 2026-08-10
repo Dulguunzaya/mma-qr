@@ -16,8 +16,8 @@ export function AuthCard({
   children: ReactNode;
 }) {
   return (
-    <section className="mx-auto w-full max-w-md px-6 py-16 sm:py-24">
-      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
+    <section className="mx-auto w-full max-w-md px-4 py-10 sm:px-6 sm:py-24">
+      <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-8">
         <h1 className="text-2xl font-semibold text-neutral-800">{title}</h1>
         <p className="mt-2 text-sm leading-6 text-neutral-500">{description}</p>
         <div className="mt-8">{children}</div>

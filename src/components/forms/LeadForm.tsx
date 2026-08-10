@@ -32,7 +32,7 @@ export default function LeadForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm sm:p-8"
+      className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm sm:p-8"
     >
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
@@ -130,7 +130,7 @@ export default function LeadForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-6 inline-flex h-12 items-center justify-center rounded-md bg-primary-600 px-8 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-px hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-md bg-primary-600 px-8 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-px hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
       >
         {isSubmitting ? t("submitting") : t("submit")}
       </button>

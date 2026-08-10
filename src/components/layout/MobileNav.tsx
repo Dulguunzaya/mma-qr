@@ -12,6 +12,7 @@ import { useMobileNav } from "@/hooks/useMobileNav";
 import { cn } from "@/lib/utils";
 import { NavItemLink } from "./NavItemLink";
 import { BrandLogo } from "./BrandLogo";
+import { HeaderAuth } from "@/components/auth/HeaderAuth";
 
 export function MobileNav({ entries }: { entries: NavEntry[] }) {
   const t = useTranslations("nav");
@@ -44,22 +45,25 @@ export function MobileNav({ entries }: { entries: NavEntry[] }) {
             className="fixed inset-0 z-[100] h-dvh w-full bg-background lg:hidden"
           >
             <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center justify-between border-b border-neutral-200 px-5">
-            <BrandLogo />
-            <button
-              type="button"
-              aria-label={t("close")}
-              onClick={close}
-              autoFocus
-              className="flex h-11 w-11 items-center justify-center rounded-md text-neutral-700 hover:bg-neutral-100"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+              <div className="flex h-16 items-center justify-between border-b border-neutral-200 px-5">
+                <BrandLogo />
+                <button
+                  type="button"
+                  aria-label={t("close")}
+                  onClick={close}
+                  autoFocus
+                  className="flex h-11 w-11 items-center justify-center rounded-md text-neutral-700 hover:bg-neutral-100"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-          <nav aria-label={t("menu")} className="flex-1 overflow-y-auto px-5 py-6">
-            <ul className="flex flex-col divide-y divide-neutral-100">
-              {entries.map(({ item, children }) => {
+              <nav
+                aria-label={t("menu")}
+                className="flex-1 overflow-y-auto px-5 py-6"
+              >
+                <ul className="flex flex-col divide-y divide-neutral-100">
+                  {entries.map(({ item, children }) => {
                 const hasChildren = children.length > 0;
                 const hasMoreChildren =
                   children.length > NAV_DROPDOWN_ITEM_LIMIT;
@@ -127,9 +131,21 @@ export function MobileNav({ entries }: { entries: NavEntry[] }) {
                     )}
                   </li>
                 );
-              })}
-            </ul>
-          </nav>
+                  })}
+                </ul>
+              </nav>
+              <div className="border-t border-neutral-200 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4">
+                <div className="flex flex-col gap-2">
+                  <HeaderAuth mobile onNavigate={close} />
+                  <Link
+                    href="/join-as-a-member"
+                    onClick={close}
+                    className="flex min-h-11 items-center justify-center rounded-md bg-primary-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+                  >
+                    {t("becomeMember")}
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>,
           document.body,

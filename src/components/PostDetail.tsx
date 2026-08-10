@@ -23,7 +23,7 @@ export function PostDetail({
   const formattedDate = formatDate(date);
 
   return (
-    <article className="mx-auto max-w-[820px] px-6 py-12 sm:py-16 lg:px-10">
+    <article className="mx-auto max-w-[820px] px-4 py-10 sm:px-6 sm:py-16 lg:px-10">
       <div>
         <Link
           href={backHref}

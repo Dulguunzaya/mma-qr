@@ -10,7 +10,7 @@ export default async function FlagshipEvents({ locale }: { locale: string }) {
   if (posts.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-[1200px] px-6 py-16 sm:py-24 lg:px-10">
+    <section className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10">
       <CmsSectionHeading
         slug="flagship-events"
         locale={locale}

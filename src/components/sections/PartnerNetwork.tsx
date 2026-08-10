@@ -25,7 +25,7 @@ export default async function PartnerNetwork({ locale }: { locale: string }) {
 
   return (
     <section className="border-t border-neutral-200 bg-white">
-      <div className="mx-auto max-w-[1200px] px-6 py-14 sm:py-16 lg:px-10">
+      <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-16 lg:px-10">
         <div className="grid gap-8 lg:grid-cols-[220px_1fr] lg:items-center">
           <div>
             <p className="flex items-center gap-3 font-sans text-xs font-medium uppercase tracking-[0.12em] text-accent-600">

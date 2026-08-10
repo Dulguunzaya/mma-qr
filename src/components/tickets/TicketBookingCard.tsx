@@ -320,14 +320,9 @@ export default function TicketBookingCard({
   const { user, loading: authLoading } = useAuth();
   const isCompanyAccount = user?.type === "company";
   const [isOpen, setIsOpen] = useState(false);
-  const [guestBillingType, setGuestBillingType] = useState<
-    "personal" | "company"
-  >("personal");
-  const billingType: "personal" | "company" = user
-    ? isCompanyAccount
-      ? "company"
-      : "personal"
-    : guestBillingType;
+  const billingType: "personal" | "company" = isCompanyAccount
+    ? "company"
+    : "personal";
   const [quantity, setQuantity] = useState(1);
   const [eventHasPassed, setEventHasPassed] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -539,7 +534,6 @@ export default function TicketBookingCard({
     if (ticketPrice === null || hasEventDatePassed(eventDate)) return;
 
     setCompletedBooking(null);
-    setGuestBillingType("personal");
     setSubmitError("");
     setIsOpen(true);
   }
@@ -865,7 +859,7 @@ export default function TicketBookingCard({
     <>
       <aside className="lg:sticky lg:top-24">
         <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg">
-          <div className="flex items-center justify-between bg-primary-800 px-6 py-4 text-white">
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-primary-800 px-4 py-4 text-white sm:px-6">
             <span className="inline-flex items-center gap-2 text-sm font-semibold">
               <Ticket className="h-4 w-4 text-accent-300" aria-hidden="true" />
               {eventT("ticket")}
@@ -885,7 +879,7 @@ export default function TicketBookingCard({
             </span>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-neutral-500">
               {eventT("startingFrom")}
             </p>
@@ -949,7 +943,7 @@ export default function TicketBookingCard({
               </div>
             </dl>
 
-            <div className="mt-5 flex items-end justify-between gap-4">
+            <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">
                   {eventT("quantity")}
@@ -1036,7 +1030,7 @@ export default function TicketBookingCard({
             role="dialog"
             aria-modal="true"
             aria-labelledby="ticket-dialog-title"
-            className="relative flex max-h-[96dvh] w-full max-w-[1040px] flex-col overflow-hidden rounded-t-2xl bg-background shadow-2xl sm:max-h-[90dvh] sm:rounded-xl"
+            className="relative flex max-h-[calc(100dvh-env(safe-area-inset-top))] w-full max-w-[1040px] flex-col overflow-hidden rounded-t-2xl bg-background pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[90dvh] sm:rounded-xl sm:pb-0"
           >
             <div className="flex items-start justify-between gap-6 border-b border-neutral-200 bg-white px-5 py-4 sm:px-7 sm:py-5">
               <div>
@@ -1181,9 +1175,9 @@ export default function TicketBookingCard({
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_300px]"
+                className="min-h-0 flex-1 overflow-y-auto lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:overflow-hidden"
               >
-                <div className="overflow-y-auto px-5 py-6 sm:px-7 sm:py-8">
+                <div className="px-4 py-6 sm:px-7 sm:py-8 lg:overflow-y-auto">
                   <p className="text-sm leading-6 text-neutral-500">
                     {t("requiredHint")}
                   </p>
@@ -1304,9 +1298,9 @@ export default function TicketBookingCard({
                     </legend>
                     <div className="mt-5 grid gap-3 sm:grid-cols-2 sm:items-start">
                       <div className="grid gap-3">
-                        {(!user || !isCompanyAccount) && (
+                        {!isCompanyAccount && (
                           <label
-                            className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+                            className={`flex cursor-default items-start gap-3 rounded-lg border p-3 transition-colors ${
                               billingType === "personal"
                                 ? "border-primary-700 bg-primary-50"
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
@@ -1317,7 +1311,7 @@ export default function TicketBookingCard({
                               name="billingType"
                               value="personal"
                               checked={billingType === "personal"}
-                              onChange={() => setGuestBillingType("personal")}
+                              readOnly
                               className="sr-only"
                             />
                             <UserRound
@@ -1334,9 +1328,9 @@ export default function TicketBookingCard({
                             </span>
                           </label>
                         )}
-                        {(!user || isCompanyAccount) && (
+                        {isCompanyAccount && (
                           <label
-                            className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+                            className={`flex cursor-default items-start gap-3 rounded-lg border p-3 transition-colors ${
                               billingType === "company"
                                 ? "border-primary-700 bg-primary-50"
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
@@ -1347,7 +1341,7 @@ export default function TicketBookingCard({
                               name="billingType"
                               value="company"
                               checked={billingType === "company"}
-                              onChange={() => setGuestBillingType("company")}
+                              readOnly
                               className="sr-only"
                             />
                             <Building2
@@ -1410,7 +1404,7 @@ export default function TicketBookingCard({
                             </p>
                           </div>
                         )}
-                        {user && !isCompanyAccount && (
+                        {!isCompanyAccount && (
                           <div className="flex items-start gap-3 rounded-lg bg-neutral-100/70 px-3 py-2.5">
                             <Building2
                               className="mt-0.5 h-4 w-4 shrink-0 text-primary-700"

@@ -71,10 +71,10 @@ function MemberRows({ posts, badge }: { posts: Post[]; badge: string }) {
       {posts.map((post) => (
         <div
           key={post._id}
-          className="flex items-center justify-between gap-4 border-b border-neutral-100 px-5 py-4 last:border-b-0 sm:px-6"
+          className="flex flex-col items-start gap-3 border-b border-neutral-100 px-4 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-6"
         >
           <div className="min-w-0">
-            <h3 className="truncate text-sm font-semibold text-neutral-800 sm:text-base">
+            <h3 className="line-clamp-2 text-sm font-semibold text-neutral-800 sm:truncate sm:text-base">
               {post.title}
             </h3>
             {post.excerpt && (
@@ -260,7 +260,7 @@ export default async function CmsPage({
         />
         <section
           id="page-content"
-          className="mx-auto max-w-[1200px] scroll-mt-24 px-6 pb-14 pt-8 sm:pb-20 sm:pt-10 lg:px-10"
+          className="mx-auto max-w-[1200px] scroll-mt-24 px-4 pb-14 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:px-10"
         >
           <CmsSectionHeading slug={`${hub}-listing`} locale={locale} />
 
@@ -311,7 +311,7 @@ export default async function CmsPage({
         eyebrow={getSubheader(page)}
         description={page.content}
       />
-      <div className="mx-auto max-w-[1200px] px-6 pb-12 pt-8 sm:pb-16 sm:pt-10 lg:px-10">
+      <div className="mx-auto max-w-[1200px] px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:px-10">
         <HubContent
           hub={hub}
           posts={posts}

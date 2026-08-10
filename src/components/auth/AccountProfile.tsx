@@ -115,17 +115,17 @@ export function AccountProfile() {
   }
 
   return (
-    <section className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
-      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
+    <section className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-24">
+      <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-8">
         <p className="text-sm font-medium uppercase tracking-wider text-accent-700">
           {t("account")}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold text-neutral-800">
+        <h1 className="mt-2 [overflow-wrap:anywhere] text-2xl font-semibold text-neutral-800 sm:text-3xl">
           {name || user.username || user.email}
         </h1>
         <form
           onSubmit={handleContactSubmit}
-          className="mt-8 rounded-lg border border-neutral-200 bg-neutral-50 p-5"
+          className="mt-8 rounded-lg border border-neutral-200 bg-neutral-50 p-4 sm:p-5"
         >
           <h2 className="text-lg font-semibold text-neutral-800">
             {t("contactInformation")}
@@ -180,7 +180,7 @@ export function AccountProfile() {
         {user.company && (
           <form
             onSubmit={handleCompanyCodeSubmit}
-            className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-5"
+            className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4 sm:p-5"
           >
             <h2 className="text-lg font-semibold text-neutral-800">
               {t("companyCode")}

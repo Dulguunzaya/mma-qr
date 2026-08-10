@@ -27,8 +27,8 @@ export default async function Footer({ locale }: { locale: string }) {
 
   return (
     <footer className="bg-footer-bg text-footer-fg">
-      <div className="mx-auto max-w-[1200px] px-6 py-16 lg:px-10">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-16 lg:px-10">
+        <div className="grid gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4">
           <div>
             <Link
               href="/"
