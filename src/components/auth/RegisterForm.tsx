@@ -50,6 +50,7 @@ export function RegisterForm() {
     lastName?: string;
     companyName?: string;
     phone?: string;
+    password?: string;
   } | null>(null);
   const [register, registerState] = useMutation<
     ClientPortalUserRegisterData,
@@ -146,7 +147,15 @@ export function RegisterForm() {
       }
 
       if (user.isVerified) {
-        await loginWithCredentials({ variables: { email, password } });
+        const loginResult = await loginWithCredentials({
+          variables: { email, password },
+        });
+        const loginResponse =
+          loginResult.data?.clientPortalUserLoginWithCredentials;
+
+        await login(
+          typeof loginResponse === "object" ? loginResponse : undefined,
+        );
         await saveRegisteredDetails({
           email,
           firstName: userType === "customer" ? firstName : undefined,
@@ -154,7 +163,6 @@ export function RegisterForm() {
           companyName: userType === "company" ? companyName : undefined,
           phone: userType === "company" ? phone : undefined,
         });
-        await login();
         router.push("/");
         return;
       }
@@ -167,6 +175,7 @@ export function RegisterForm() {
         lastName: userType === "customer" ? lastName : undefined,
         companyName: userType === "company" ? companyName : undefined,
         phone: userType === "company" ? phone : undefined,
+        password,
       });
       await requestOTP({ variables: { identifier: email } });
       setCodeSent(true);
@@ -202,10 +211,14 @@ export function RegisterForm() {
 
     try {
       if (registeredUser.flow === "login") {
-        await loginWithOTP({
+        const loginResult = await loginWithOTP({
           variables: { identifier: registeredUser.email, otp: code },
         });
-        await login();
+        const loginResponse = loginResult.data?.clientPortalUserLoginWithOTP;
+
+        await login(
+          typeof loginResponse === "object" ? loginResponse : undefined,
+        );
         router.push("/");
         return;
       }
@@ -217,6 +230,24 @@ export function RegisterForm() {
           code,
         },
       });
+
+      if (registeredUser.password) {
+        const loginResult = await loginWithCredentials({
+          variables: {
+            email: registeredUser.email,
+            password: registeredUser.password,
+          },
+        });
+        const loginResponse =
+          loginResult.data?.clientPortalUserLoginWithCredentials;
+
+        await login(
+          typeof loginResponse === "object" ? loginResponse : undefined,
+        );
+      } else {
+        await login();
+      }
+
       await saveRegisteredDetails({
         email: registeredUser.email,
         firstName: registeredUser.firstName,
@@ -224,7 +255,6 @@ export function RegisterForm() {
         companyName: registeredUser.companyName,
         phone: registeredUser.phone,
       });
-      await login();
       router.push("/");
     } catch (err) {
       setError(

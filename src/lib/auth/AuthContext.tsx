@@ -21,10 +21,41 @@ import {
 type AuthContextValue = {
   user: CPUser | null;
   loading: boolean;
-  login: () => Promise<void>;
+  login: (tokens?: AuthTokens) => Promise<void>;
   logout: () => Promise<void>;
   refetch: () => Promise<unknown>;
 };
+
+export type AuthTokens = {
+  token: string;
+  refreshToken?: string;
+};
+
+const TOKEN_KEY = "token";
+const REFRESH_TOKEN_KEY = "refreshToken";
+
+function clearStoredTokens() {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  } catch {
+    // Storage can be unavailable in private or restricted mobile browsers.
+  }
+}
+
+function storeTokens(tokens: AuthTokens) {
+  try {
+    localStorage.setItem(TOKEN_KEY, tokens.token);
+
+    if (tokens.refreshToken) {
+      localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
+    } else {
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+    }
+  } catch {
+    // The same-origin HttpOnly session below remains the source of truth.
+  }
+}
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -42,8 +73,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const login = useCallback(
-    async () => {
-      localStorage.removeItem("token");
+    async (tokens?: AuthTokens) => {
+      if (tokens?.token) {
+        storeTokens(tokens);
+
+        const response = await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ token: tokens.token }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to persist the authentication session");
+        }
+      } else {
+        // Cookie-delivery portals should not keep a stale header token.
+        clearStoredTokens();
+      }
+
       await client.resetStore();
     },
     [client],
@@ -53,7 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await logoutMutation();
     } finally {
-      localStorage.removeItem("token");
+      clearStoredTokens();
+      await fetch("/api/auth/session", { method: "DELETE" }).catch(() => {});
       await client.clearStore();
     }
   }, [client, logoutMutation]);

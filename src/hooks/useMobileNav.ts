@@ -1,22 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useMobileNav() {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
   }, [open]);
 
   function close() {
     setOpen(false);
     setExpanded(null);
+  }
+
+  function openMenu() {
+    setOpen(true);
   }
 
   function toggleExpanded(id: string) {
@@ -25,10 +38,9 @@ export function useMobileNav() {
 
   return {
     close,
-    dialogRef,
     expanded,
     isOpen: open,
-    openMenu: () => setOpen(true),
+    openMenu,
     toggleExpanded,
   };
 }

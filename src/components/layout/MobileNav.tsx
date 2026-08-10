@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import {
@@ -16,7 +17,6 @@ export function MobileNav({ entries }: { entries: NavEntry[] }) {
   const t = useTranslations("nav");
   const {
     close,
-    dialogRef,
     expanded,
     isOpen,
     openMenu,
@@ -35,14 +35,15 @@ export function MobileNav({ entries }: { entries: NavEntry[] }) {
         <Menu className="h-5 w-5" />
       </button>
 
-      <dialog
-        ref={dialogRef}
-        aria-label={t("menu")}
-        onCancel={close}
-        onClose={close}
-        className="m-0 h-dvh max-h-none w-full max-w-none bg-background p-0 backdrop:bg-black/20 lg:hidden"
-      >
-        <div className="flex h-full flex-col">
+      {isOpen &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("menu")}
+            className="fixed inset-0 z-[100] h-dvh w-full bg-background lg:hidden"
+          >
+            <div className="flex h-full flex-col">
           <div className="flex h-16 items-center justify-between border-b border-neutral-200 px-5">
             <BrandLogo />
             <button
@@ -129,8 +130,10 @@ export function MobileNav({ entries }: { entries: NavEntry[] }) {
               })}
             </ul>
           </nav>
-        </div>
-      </dialog>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

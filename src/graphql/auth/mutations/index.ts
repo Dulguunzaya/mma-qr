@@ -160,7 +160,13 @@ export type ClientPortalUserLoginWithOTPVariables = {
 };
 
 export type ClientPortalUserLoginWithOTPData = {
-  clientPortalUserLoginWithOTP: { token: string };
+  clientPortalUserLoginWithOTP:
+    | "Success"
+    | {
+        success: true;
+        token: string;
+        refreshToken: string;
+      };
 };
 
 export const CLIENT_PORTAL_USER_LOGIN_WITH_SOCIAL = gql`

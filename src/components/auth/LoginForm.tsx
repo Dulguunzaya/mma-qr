@@ -42,7 +42,7 @@ export function LoginForm() {
       const response = result.data?.clientPortalUserLoginWithCredentials;
 
       if (response) {
-        await login();
+        await login(typeof response === "object" ? response : undefined);
         router.push("/");
       }
     } catch {
