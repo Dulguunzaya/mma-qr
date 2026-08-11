@@ -41,15 +41,9 @@ export default async function Header({ locale }: { locale: string }) {
 
           <MegaMenu entries={entries} />
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-4">
             <LanguageSwitcher locales={routing.locales} />
             <HeaderAuth />
-            <Link
-              href="/join-as-a-member"
-              className="hidden rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-px hover:bg-primary-700 sm:inline-block"
-            >
-              {t("becomeMember")}
-            </Link>
             <MobileNav entries={entries} />
           </div>
         </div>

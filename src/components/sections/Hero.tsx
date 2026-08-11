@@ -69,18 +69,18 @@ export default async function Hero({ locale }: { locale: string }) {
         }}
       />
       <div className="relative mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10 lg:py-28">
-        <div className="max-w-2xl">
+        <div>
           {eyebrow && (
             <p className="flex items-center gap-3 font-sans text-xs font-medium uppercase tracking-[0.12em] text-accent-600">
               <span className="h-px w-8 bg-accent-500" aria-hidden="true" />
               {eyebrow}
             </p>
           )}
-          <h1 className="mt-5 [overflow-wrap:anywhere] font-sans text-[clamp(2rem,9vw,3.75rem)] font-semibold leading-[1.1] tracking-tight text-primary-900">
+          <h1 className="mt-5 max-w-5xl [overflow-wrap:anywhere] font-sans text-[clamp(2rem,9vw,3.75rem)] font-semibold leading-[1.1] tracking-tight text-primary-900">
             {headline}
           </h1>
           {subhead && (
-            <p className="mt-6 text-lg leading-8 text-neutral-500">{subhead}</p>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-neutral-500">{subhead}</p>
           )}
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -106,7 +106,7 @@ export default async function Hero({ locale }: { locale: string }) {
               </Link>
             </div>
           )}
-          <dl className="mt-10 grid grid-cols-3 divide-x divide-neutral-200 border-y border-neutral-200 py-5">
+          <dl className="mt-10 grid max-w-3xl grid-cols-3 divide-x divide-neutral-200 border-y border-neutral-200 py-5">
             {HERO_STATS.map(({ id, cmsKey }) => (
               <div key={id} className="min-w-0 px-2 first:pl-0 last:pr-0 sm:px-4">
                 <dt className="mt-1 text-xs leading-5 text-neutral-500 sm:text-sm">
@@ -119,7 +119,7 @@ export default async function Hero({ locale }: { locale: string }) {
             ))}
           </dl>
           {credibility && (
-            <p className="mt-5 font-sans text-[11px] leading-5 tracking-wide text-neutral-500">
+            <p className="mt-5 max-w-3xl font-sans text-[11px] leading-5 tracking-wide text-neutral-500">
               {credibility}
             </p>
           )}

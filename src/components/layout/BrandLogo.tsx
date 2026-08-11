@@ -10,7 +10,7 @@ export function BrandLogo({ className, priority = false }: BrandLogoProps) {
   return (
     <span
       className={cn(
-        "relative block h-10 w-[124px] shrink-0 overflow-hidden",
+        "relative block aspect-[251/98] w-28 shrink-0 overflow-hidden sm:w-32 xl:w-[152px]",
         className
       )}
     >
@@ -20,8 +20,9 @@ export function BrandLogo({ className, priority = false }: BrandLogoProps) {
         width={424}
         height={154}
         priority={priority}
-        sizes="124px"
-        className="absolute -left-[49px] -top-5 h-[81px] w-[223px] max-w-none"
+        sizes="(min-width: 1280px) 257px, (min-width: 640px) 216px, 189px"
+        style={{ maxWidth: "none" }}
+        className="absolute left-[-34.66%] top-[-30.61%] h-[157.14%] w-[168.92%] max-w-none"
       />
     </span>
   );

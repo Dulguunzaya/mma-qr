@@ -34,12 +34,62 @@ import {
   buttonClassName,
   fieldClassName,
 } from "./AuthCard";
+import { cn } from "@/lib/utils";
+
+type RegistrationField =
+  | "companyName"
+  | "phone"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "password";
+
+type RegistrationFieldErrors = Partial<Record<RegistrationField, string>>;
+
+const PASSWORD_REQUIREMENTS = [
+  {
+    key: "passwordMinLength",
+    test: (password: string) => password.length >= 8,
+  },
+  {
+    key: "passwordUppercase",
+    test: (password: string) => /[A-ZА-ЯЁӨҮ]/.test(password),
+  },
+  {
+    key: "passwordLowercase",
+    test: (password: string) => /[a-zа-яёөү]/.test(password),
+  },
+  {
+    key: "passwordNumber",
+    test: (password: string) => /[0-9]/.test(password),
+  },
+  {
+    key: "passwordSpecialCharacter",
+    test: (password: string) => /[^\p{L}\p{N}\s]/u.test(password),
+  },
+] as const;
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function getServerMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return "";
+  }
+
+  return error.message
+    .replace(/^(ApolloError|GraphQL error):\s*/i, "")
+    .trim()
+    .slice(0, 240);
+}
 
 export function RegisterForm() {
   const t = useTranslations("auth");
   const router = useRouter();
   const { login } = useAuth();
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] =
+    useState<RegistrationFieldErrors>({});
+  const [password, setPassword] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [userType, setUserType] = useState<CPUserType>("customer");
   const [registeredUser, setRegisteredUser] = useState<{
@@ -81,6 +131,66 @@ export function RegisterForm() {
     ClientPortalUserLoginWithOTPVariables
   >(CLIENT_PORTAL_USER_LOGIN_WITH_OTP);
 
+  const passwordRequirements = PASSWORD_REQUIREMENTS.map((requirement) => ({
+    ...requirement,
+    met: requirement.test(password),
+  }));
+
+  function clearFieldError(field: RegistrationField) {
+    setFieldErrors((current) => {
+      if (!current[field]) {
+        return current;
+      }
+
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+    setError("");
+  }
+
+  function getRegistrationError(error: unknown): {
+    field?: RegistrationField;
+    message: string;
+  } {
+    const serverMessage = getServerMessage(error);
+
+    if (/already exists|already registered|duplicate/i.test(serverMessage)) {
+      return { message: t("accountExists") };
+    }
+
+    if (
+      /e-?mail/i.test(serverMessage) &&
+      /invalid|required|valid/i.test(serverMessage)
+    ) {
+      return { field: "email", message: t("emailInvalid") };
+    }
+
+    if (
+      /phone/i.test(serverMessage) &&
+      /invalid|required|valid/i.test(serverMessage)
+    ) {
+      return { field: "phone", message: t("phoneInvalid") };
+    }
+
+    if (/password/i.test(serverMessage)) {
+      return {
+        field: "password",
+        message: t("passwordRequirementsError"),
+      };
+    }
+
+    if (/network|failed to fetch|load failed|connection/i.test(serverMessage)) {
+      return { message: t("registrationNetworkError") };
+    }
+
+    return {
+      message: serverMessage
+        ? t("registrationErrorWithReason", { reason: serverMessage })
+        : t("registrationUnknownError"),
+    };
+  }
+
   async function saveRegisteredDetails(details: {
     email: string;
     firstName?: string;
@@ -118,21 +228,64 @@ export function RegisterForm() {
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email")).trim();
     const companyName = String(form.get("companyName") ?? "").trim();
+    const submittedPassword = String(form.get("password"));
+    const phone = String(form.get("phone") ?? "").trim();
+    const firstName = String(form.get("firstName") ?? "").trim();
+    const lastName = String(form.get("lastName") ?? "").trim();
+    const nextFieldErrors: RegistrationFieldErrors = {};
 
-    if (userType === "company" && !companyName) {
-      setError(t("genericError"));
+    setPassword(submittedPassword);
+
+    if (userType === "company") {
+      if (!companyName) {
+        nextFieldErrors.companyName = t("companyNameRequired");
+      }
+
+      const phoneDigitCount = phone.replace(/\D/g, "").length;
+      if (!phone) {
+        nextFieldErrors.phone = t("phoneRequired");
+      } else if (phoneDigitCount < 8 || phoneDigitCount > 15) {
+        nextFieldErrors.phone = t("phoneInvalid");
+      }
+    } else {
+      if (!firstName) {
+        nextFieldErrors.firstName = t("firstNameRequired");
+      }
+      if (!lastName) {
+        nextFieldErrors.lastName = t("lastNameRequired");
+      }
+    }
+
+    if (!email) {
+      nextFieldErrors.email = t("emailRequired");
+    } else if (!EMAIL_PATTERN.test(email)) {
+      nextFieldErrors.email = t("emailInvalid");
+    }
+
+    if (!submittedPassword) {
+      nextFieldErrors.password = t("passwordRequired");
+    } else {
+      const missingRequirements = PASSWORD_REQUIREMENTS.filter(
+        (requirement) => !requirement.test(submittedPassword),
+      ).map((requirement) => t(requirement.key));
+
+      if (missingRequirements.length > 0) {
+        nextFieldErrors.password = t("passwordRequirementsMissing", {
+          requirements: missingRequirements.join(", "),
+        });
+      }
+    }
+
+    setFieldErrors(nextFieldErrors);
+    if (Object.keys(nextFieldErrors).length > 0) {
       return;
     }
 
     try {
-      const password = String(form.get("password"));
-      const phone = String(form.get("phone") ?? "").trim();
-      const firstName = String(form.get("firstName") ?? "").trim();
-      const lastName = String(form.get("lastName") ?? "").trim();
       const result = await register({
         variables: {
           email,
-          password,
+          password: submittedPassword,
           userType,
           phone: userType === "company" ? phone : undefined,
           username: userType === "company" ? companyName : undefined,
@@ -143,12 +296,13 @@ export function RegisterForm() {
       const user = result.data?.clientPortalUserRegister;
 
       if (!user) {
+        setError(t("registrationNoResponse"));
         return;
       }
 
       if (user.isVerified) {
         const loginResult = await loginWithCredentials({
-          variables: { email, password },
+          variables: { email, password: submittedPassword },
         });
         const loginResponse =
           loginResult.data?.clientPortalUserLoginWithCredentials;
@@ -175,7 +329,7 @@ export function RegisterForm() {
         lastName: userType === "customer" ? lastName : undefined,
         companyName: userType === "company" ? companyName : undefined,
         phone: userType === "company" ? phone : undefined,
-        password,
+        password: submittedPassword,
       });
       await requestOTP({ variables: { identifier: email } });
       setCodeSent(true);
@@ -190,11 +344,16 @@ export function RegisterForm() {
           // Passwordless login is disabled; ask them to sign in instead.
         }
       }
-      setError(
-        err instanceof Error && /already exists/i.test(err.message)
-          ? t("accountExists")
-          : t("genericError"),
-      );
+      const registrationError = getRegistrationError(err);
+      if (registrationError.field) {
+        setFieldErrors((current) => ({
+          ...current,
+          [registrationError.field as RegistrationField]:
+            registrationError.message,
+        }));
+      } else {
+        setError(registrationError.message);
+      }
     }
   }
 
@@ -208,6 +367,11 @@ export function RegisterForm() {
 
     const form = new FormData(event.currentTarget);
     const code = String(form.get("code")).trim();
+
+    if (!code) {
+      setError(t("verificationCodeRequired"));
+      return;
+    }
 
     try {
       if (registeredUser.flow === "login") {
@@ -279,8 +443,15 @@ export function RegisterForm() {
         variables: { identifier: registeredUser.email },
       });
       setCodeSent(true);
-    } catch {
-      setError(t("genericError"));
+    } catch (err) {
+      const serverMessage = getServerMessage(err);
+      setError(
+        /network|failed to fetch|load failed|connection/i.test(serverMessage)
+          ? t("registrationNetworkError")
+          : serverMessage
+            ? t("resendCodeErrorWithReason", { reason: serverMessage })
+            : t("resendCodeError"),
+      );
     }
   }
 
@@ -292,7 +463,11 @@ export function RegisterForm() {
       }
     >
       {registeredUser ? (
-        <form onSubmit={handleVerification} className="space-y-5">
+        <form
+          onSubmit={handleVerification}
+          className="space-y-5"
+          noValidate
+        >
           <label className="block text-sm font-medium text-neutral-700">
             {t("verificationCode")}
             <input
@@ -304,7 +479,11 @@ export function RegisterForm() {
               className={fieldClassName}
             />
           </label>
-          {error && <p className="text-sm text-red-700">{error}</p>}
+          {error && (
+            <p className="text-sm leading-6 text-red-700" role="alert">
+              {error}
+            </p>
+          )}
           {codeSent && (
             <p className="text-sm text-green-700">{t("codeSent")}</p>
           )}
@@ -330,7 +509,11 @@ export function RegisterForm() {
         </form>
       ) : (
         <>
-          <form onSubmit={handleRegistration} className="space-y-5">
+          <form
+            onSubmit={handleRegistration}
+            className="space-y-5"
+            noValidate
+          >
             <div className="grid grid-cols-2 gap-2 rounded-md bg-neutral-100 p-1">
               {(["customer", "company"] as const).map((type) => (
                 <button
@@ -339,6 +522,7 @@ export function RegisterForm() {
                   onClick={() => {
                     setUserType(type);
                     setError("");
+                    setFieldErrors({});
                   }}
                   aria-pressed={userType === type}
                   className={
@@ -362,8 +546,26 @@ export function RegisterForm() {
                     autoComplete="organization"
                     required
                     maxLength={200}
-                    className={fieldClassName}
+                    aria-invalid={Boolean(fieldErrors.companyName)}
+                    aria-describedby={
+                      fieldErrors.companyName ? "company-name-error" : undefined
+                    }
+                    onChange={() => clearFieldError("companyName")}
+                    className={cn(
+                      fieldClassName,
+                      fieldErrors.companyName &&
+                        "border-red-500 focus:border-red-500 focus:ring-red-100",
+                    )}
                   />
+                  {fieldErrors.companyName && (
+                    <span
+                      id="company-name-error"
+                      className="mt-1.5 block text-xs font-normal text-red-700"
+                      role="alert"
+                    >
+                      {fieldErrors.companyName}
+                    </span>
+                  )}
                 </label>
                 <label className="block text-sm font-medium text-neutral-700">
                   {t("phone")}
@@ -373,8 +575,26 @@ export function RegisterForm() {
                     autoComplete="tel"
                     required
                     maxLength={32}
-                    className={fieldClassName}
+                    aria-invalid={Boolean(fieldErrors.phone)}
+                    aria-describedby={
+                      fieldErrors.phone ? "phone-error" : undefined
+                    }
+                    onChange={() => clearFieldError("phone")}
+                    className={cn(
+                      fieldClassName,
+                      fieldErrors.phone &&
+                        "border-red-500 focus:border-red-500 focus:ring-red-100",
+                    )}
                   />
+                  {fieldErrors.phone && (
+                    <span
+                      id="phone-error"
+                      className="mt-1.5 block text-xs font-normal text-red-700"
+                      role="alert"
+                    >
+                      {fieldErrors.phone}
+                    </span>
+                  )}
                 </label>
               </>
             ) : (
@@ -386,8 +606,26 @@ export function RegisterForm() {
                     autoComplete="given-name"
                     required
                     maxLength={100}
-                    className={fieldClassName}
+                    aria-invalid={Boolean(fieldErrors.firstName)}
+                    aria-describedby={
+                      fieldErrors.firstName ? "first-name-error" : undefined
+                    }
+                    onChange={() => clearFieldError("firstName")}
+                    className={cn(
+                      fieldClassName,
+                      fieldErrors.firstName &&
+                        "border-red-500 focus:border-red-500 focus:ring-red-100",
+                    )}
                   />
+                  {fieldErrors.firstName && (
+                    <span
+                      id="first-name-error"
+                      className="mt-1.5 block text-xs font-normal text-red-700"
+                      role="alert"
+                    >
+                      {fieldErrors.firstName}
+                    </span>
+                  )}
                 </label>
                 <label className="block text-sm font-medium text-neutral-700">
                   {t("lastName")}
@@ -396,8 +634,26 @@ export function RegisterForm() {
                     autoComplete="family-name"
                     required
                     maxLength={100}
-                    className={fieldClassName}
+                    aria-invalid={Boolean(fieldErrors.lastName)}
+                    aria-describedby={
+                      fieldErrors.lastName ? "last-name-error" : undefined
+                    }
+                    onChange={() => clearFieldError("lastName")}
+                    className={cn(
+                      fieldClassName,
+                      fieldErrors.lastName &&
+                        "border-red-500 focus:border-red-500 focus:ring-red-100",
+                    )}
                   />
+                  {fieldErrors.lastName && (
+                    <span
+                      id="last-name-error"
+                      className="mt-1.5 block text-xs font-normal text-red-700"
+                      role="alert"
+                    >
+                      {fieldErrors.lastName}
+                    </span>
+                  )}
                 </label>
               </div>
             )}
@@ -409,8 +665,24 @@ export function RegisterForm() {
                 autoComplete="email"
                 required
                 maxLength={254}
-                className={fieldClassName}
+                aria-invalid={Boolean(fieldErrors.email)}
+                aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                onChange={() => clearFieldError("email")}
+                className={cn(
+                  fieldClassName,
+                  fieldErrors.email &&
+                    "border-red-500 focus:border-red-500 focus:ring-red-100",
+                )}
               />
+              {fieldErrors.email && (
+                <span
+                  id="email-error"
+                  className="mt-1.5 block text-xs font-normal text-red-700"
+                  role="alert"
+                >
+                  {fieldErrors.email}
+                </span>
+              )}
             </label>
             <label className="block text-sm font-medium text-neutral-700">
               {t("password")}
@@ -421,10 +693,65 @@ export function RegisterForm() {
                 required
                 minLength={8}
                 maxLength={128}
-                className={fieldClassName}
+                aria-invalid={Boolean(fieldErrors.password)}
+                aria-describedby={
+                  fieldErrors.password
+                    ? "password-requirements password-error"
+                    : "password-requirements"
+                }
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  clearFieldError("password");
+                }}
+                className={cn(
+                  fieldClassName,
+                  fieldErrors.password &&
+                    "border-red-500 focus:border-red-500 focus:ring-red-100",
+                )}
               />
+              {fieldErrors.password && (
+                <span
+                  id="password-error"
+                  className="mt-1.5 block text-xs font-normal leading-5 text-red-700"
+                  role="alert"
+                >
+                  {fieldErrors.password}
+                </span>
+              )}
             </label>
-            {error && <p className="text-sm text-red-700">{error}</p>}
+            <div
+              id="password-requirements"
+              className="rounded-md bg-neutral-50 px-3 py-2.5"
+            >
+              <p className="text-xs font-medium text-neutral-700">
+                {t("passwordRequirementsTitle")}
+              </p>
+              <ul className="mt-2 grid gap-1 text-xs sm:grid-cols-2">
+                {passwordRequirements.map((requirement) => (
+                  <li
+                    key={requirement.key}
+                    className={cn(
+                      "flex gap-1.5",
+                      requirement.met
+                        ? "text-green-700"
+                        : password
+                          ? "text-red-700"
+                          : "text-neutral-500",
+                    )}
+                  >
+                    <span aria-hidden="true">
+                      {requirement.met ? "✓" : "•"}
+                    </span>
+                    {t(requirement.key)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {error && (
+              <p className="text-sm leading-6 text-red-700" role="alert">
+                {error}
+              </p>
+            )}
             <button
               disabled={registerState.loading || requestOTPState.loading}
               className={buttonClassName}

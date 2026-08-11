@@ -1182,6 +1182,39 @@ export default function TicketBookingCard({
                     {t("requiredHint")}
                   </p>
 
+                  <section
+                    aria-labelledby="mobile-order-summary-title"
+                    className="mt-5 rounded-lg border border-primary-100 bg-primary-50/60 p-4 lg:hidden"
+                  >
+                    <h3
+                      id="mobile-order-summary-title"
+                      className="text-xs font-semibold uppercase tracking-[0.08em] text-primary-900"
+                    >
+                      {t("orderSummary")}
+                    </h3>
+                    <p className="mt-3 text-sm font-semibold leading-6 text-primary-900">
+                      {eventTitle}
+                    </p>
+                    <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-primary-100 pt-3 text-xs">
+                      <div>
+                        <dt className="text-neutral-500">
+                          {t("ticketCount")}
+                        </dt>
+                        <dd className="mt-1 font-semibold text-primary-900">
+                          {quantity}
+                        </dd>
+                      </div>
+                      <div className="text-right">
+                        <dt className="text-neutral-500">
+                          {eventT("subtotal")}
+                        </dt>
+                        <dd className="mt-1 text-base font-semibold text-primary-900">
+                          {formattedSubtotal ?? "—"}
+                        </dd>
+                      </div>
+                    </dl>
+                  </section>
+
                   <section className="mt-7">
                     <div className="flex items-center justify-between gap-4">
                       <h3 className="text-lg font-semibold text-primary-900">
