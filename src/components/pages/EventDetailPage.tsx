@@ -113,6 +113,7 @@ export default async function EventDetailPage({
       "address",
     ]),
   );
+  const soldOut = findFirstCustomField(customFields, ["soldout"]) === true;
   const termsPage = await getPageBySlug("nuhtsul", locale);
   const termsLabel = termsPage
     ? getPlainText(termsPage.content ?? "") ||
@@ -194,6 +195,7 @@ export default async function EventDetailPage({
             locale={locale}
             maxQuantity={maxQuantity}
             personalBillingPipelineId={PERSONAL_BILLING_PIPELINE_ID}
+            soldOut={soldOut}
             termsLabel={termsLabel}
             unitPrice={unitPrice}
           />

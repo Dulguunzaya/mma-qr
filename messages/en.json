@@ -189,6 +189,7 @@
     "aboutTitle": "About this event",
     "ticket": "Event ticket",
     "available": "Available",
+    "soldOut": "Sold out",
     "eventEnded": "Event ended",
     "pricingPending": "Pricing pending",
     "startingFrom": "Ticket price",
@@ -212,6 +213,7 @@
     "registrationClosed": "Registration closed",
     "ticketsUnavailable": "Tickets unavailable",
     "checkoutNote": "Your attendee and payment details will be confirmed at checkout.",
+    "soldOutNote": "Tickets for this event are sold out.",
     "eventEndedNote": "Ticket sales are closed because this event has ended.",
     "priceUnavailableNote": "Ticket sales will open after the ticket price is published.",
     "support": "Need help? Contact MMA at info@marketing.org.mn"

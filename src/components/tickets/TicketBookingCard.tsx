@@ -228,6 +228,7 @@ interface TicketBookingCardProps {
   personalBillingPipelineId: string;
   eventSlug: string;
   locale: string;
+  soldOut: boolean;
   termsLabel?: string;
   unitPrice: number | null;
 }
@@ -312,6 +313,7 @@ export default function TicketBookingCard({
   personalBillingPipelineId,
   eventSlug,
   locale,
+  soldOut,
   termsLabel,
   unitPrice,
 }: TicketBookingCardProps) {
@@ -418,7 +420,8 @@ export default function TicketBookingCard({
   // Keep checkout disabled until the browser has evaluated today's date. Event
   // pages are statically generated, so a date computed in the server HTML can
   // become stale without a new deployment.
-  const bookingUnavailable = ticketPrice === null || eventHasPassed !== false;
+  const bookingUnavailable =
+    soldOut || ticketPrice === null || eventHasPassed !== false;
 
   useEffect(() => {
     const updateEventStatus = () =>
@@ -531,7 +534,7 @@ export default function TicketBookingCard({
   }
 
   function openBooking() {
-    if (ticketPrice === null || hasEventDatePassed(eventDate)) return;
+    if (soldOut || ticketPrice === null || hasEventDatePassed(eventDate)) return;
 
     setCompletedBooking(null);
     setSubmitError("");
@@ -545,6 +548,7 @@ export default function TicketBookingCard({
       !hasContactInformation ||
       ticketPrice === null ||
       subtotal === null ||
+      soldOut ||
       hasEventDatePassed(eventDate) ||
       !Number.isInteger(quantity) ||
       quantity < 1 ||
@@ -871,11 +875,13 @@ export default function TicketBookingCard({
                 }`}
                 aria-hidden="true"
               />
-              {eventHasPassed === true
-                ? eventT("eventEnded")
-                : ticketPrice === null
-                  ? eventT("pricingPending")
-                  : eventT("available")}
+              {soldOut
+                ? eventT("soldOut")
+                : eventHasPassed === true
+                  ? eventT("eventEnded")
+                  : ticketPrice === null
+                    ? eventT("pricingPending")
+                    : eventT("available")}
             </span>
           </div>
 
@@ -988,11 +994,13 @@ export default function TicketBookingCard({
               disabled={bookingUnavailable}
               className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary-700 px-6 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-800 hover:shadow-md disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600 disabled:shadow-none disabled:hover:translate-y-0"
             >
-              {eventHasPassed === true
-                ? eventT("registrationClosed")
-                : ticketPrice === null
-                  ? eventT("ticketsUnavailable")
-                  : eventT("buyTicket")}
+              {soldOut
+                ? eventT("soldOut")
+                : eventHasPassed === true
+                  ? eventT("registrationClosed")
+                  : ticketPrice === null
+                    ? eventT("ticketsUnavailable")
+                    : eventT("buyTicket")}
               {!bookingUnavailable && <span aria-hidden="true">→</span>}
             </button>
 
@@ -1002,11 +1010,13 @@ export default function TicketBookingCard({
                 aria-hidden="true"
               />
               <p className="text-xs leading-5 text-neutral-500">
-                {eventHasPassed === true
-                  ? eventT("eventEndedNote")
-                  : ticketPrice === null
-                    ? eventT("priceUnavailableNote")
-                    : eventT("checkoutNote")}
+                {soldOut
+                  ? eventT("soldOutNote")
+                  : eventHasPassed === true
+                    ? eventT("eventEndedNote")
+                    : ticketPrice === null
+                      ? eventT("priceUnavailableNote")
+                      : eventT("checkoutNote")}
               </p>
             </div>
           </div>
