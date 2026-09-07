@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock3,
+  ExternalLink,
   MapPin,
   Minus,
   Plus,
@@ -217,6 +218,27 @@ function isValidCompanyRegistrationNumber(value: string): boolean {
   );
 }
 
+/** One day of a multi-day event, from a coded custom-field group. */
+export type EventSession = {
+  title?: string;
+  date?: string;
+  location?: string;
+};
+
+/**
+ * Session dates arrive as full ISO timestamps, so they are read in the event's
+ * own timezone before being formatted — otherwise a late-evening UTC value
+ * lands on the previous day.
+ */
+function formatSessionDate(value: string | undefined, locale: string): string {
+  if (!value) return "";
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return formatEventDate(value, locale);
+
+  return formatEventDate(getUlaanbaatarDateKey(parsed), locale);
+}
+
 interface TicketBookingCardProps {
   companyBillingPipelineId: string;
   productId: string | undefined;
@@ -226,6 +248,9 @@ interface TicketBookingCardProps {
   eventTitle: string;
   maxQuantity: number;
   personalBillingPipelineId: string;
+  sessions?: EventSession[];
+  /** When set, the call to action opens this instead of the booking form. */
+  ticketUrl?: string;
   eventSlug: string;
   locale: string;
   soldOut: boolean;
@@ -311,6 +336,8 @@ export default function TicketBookingCard({
   eventTitle,
   maxQuantity,
   personalBillingPipelineId,
+  sessions = [],
+  ticketUrl,
   eventSlug,
   locale,
   soldOut,
@@ -422,6 +449,10 @@ export default function TicketBookingCard({
   // become stale without a new deployment.
   const bookingUnavailable =
     soldOut || ticketPrice === null || eventHasPassed !== false;
+  const externalTicketUrl =
+    ticketUrl && !soldOut && eventHasPassed !== true ? ticketUrl : undefined;
+  const ctaClassName =
+    "mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary-700 px-6 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-800 hover:shadow-md disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600 disabled:shadow-none disabled:hover:translate-y-0";
 
   useEffect(() => {
     const updateEventStatus = () =>
@@ -904,50 +935,117 @@ export default function TicketBookingCard({
               </p>
             )}
 
-            <dl className="mt-6 space-y-4 border-y border-neutral-200 py-5">
-              <div className="grid grid-cols-[20px_1fr] gap-3">
-                <CalendarDays
-                  className="mt-0.5 h-5 w-5 text-accent-700"
-                  aria-hidden="true"
-                />
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-400">
-                    {eventT("date")}
-                  </dt>
-                  <dd className="mt-1 text-sm font-semibold text-primary-900">
-                    {formattedEventDate || eventT("dateUnavailable")}
-                  </dd>
-                </div>
+            {sessions.length > 0 ? (
+              // A multi-day event lists each day in turn; the single date and
+              // venue rows below stand in when the CMS describes only one.
+              <div className="mt-6 space-y-3 border-y border-neutral-200 py-5">
+                {sessions.map((session, index) => (
+                  <div
+                    key={`${session.title ?? "session"}-${index}`}
+                    className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5"
+                  >
+                    {session.title && (
+                      <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-accent-700">
+                        {session.title}
+                      </p>
+                    )}
+                    <dl
+                      className={session.title ? "mt-2 space-y-2" : "space-y-2"}
+                    >
+                      {session.date && (
+                        <div className="grid grid-cols-[18px_1fr] gap-2.5">
+                          <CalendarDays
+                            className="mt-0.5 h-[18px] w-[18px] text-accent-700"
+                            aria-hidden="true"
+                          />
+                          <div>
+                            <dt className="sr-only">{eventT("date")}</dt>
+                            <dd className="text-sm font-semibold text-primary-900">
+                              {formatSessionDate(session.date, locale)}
+                            </dd>
+                          </div>
+                        </div>
+                      )}
+                      {session.location && (
+                        <div className="grid grid-cols-[18px_1fr] gap-2.5">
+                          <MapPin
+                            className="mt-0.5 h-[18px] w-[18px] text-accent-700"
+                            aria-hidden="true"
+                          />
+                          <div>
+                            <dt className="sr-only">{eventT("venue")}</dt>
+                            <dd className="text-sm font-medium leading-6 text-neutral-600">
+                              {session.location}
+                            </dd>
+                          </div>
+                        </div>
+                      )}
+                    </dl>
+                  </div>
+                ))}
+                {eventTime && (
+                  <dl className="grid grid-cols-[20px_1fr] gap-3 px-1 pt-1">
+                    <Clock3
+                      className="mt-0.5 h-5 w-5 text-accent-700"
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-400">
+                        {eventT("time")}
+                      </dt>
+                      <dd className="mt-1 text-sm font-semibold text-primary-900">
+                        {eventTime}
+                      </dd>
+                    </div>
+                  </dl>
+                )}
               </div>
-              <div className="grid grid-cols-[20px_1fr] gap-3">
-                <Clock3
-                  className="mt-0.5 h-5 w-5 text-accent-700"
-                  aria-hidden="true"
-                />
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-400">
-                    {eventT("time")}
-                  </dt>
-                  <dd className="mt-1 text-sm font-semibold text-primary-900">
-                    {eventTime || eventT("timeUnavailable")}
-                  </dd>
+            ) : (
+              <dl className="mt-6 space-y-4 border-y border-neutral-200 py-5">
+                <div className="grid grid-cols-[20px_1fr] gap-3">
+                  <CalendarDays
+                    className="mt-0.5 h-5 w-5 text-accent-700"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-400">
+                      {eventT("date")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-semibold text-primary-900">
+                      {formattedEventDate || eventT("dateUnavailable")}
+                    </dd>
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-[20px_1fr] gap-3">
-                <MapPin
-                  className="mt-0.5 h-5 w-5 text-accent-700"
-                  aria-hidden="true"
-                />
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-400">
-                    {eventT("venue")}
-                  </dt>
-                  <dd className="mt-1 text-sm font-semibold leading-6 text-primary-900">
-                    {eventLocation || eventT("locationUnavailable")}
-                  </dd>
+                <div className="grid grid-cols-[20px_1fr] gap-3">
+                  <Clock3
+                    className="mt-0.5 h-5 w-5 text-accent-700"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-400">
+                      {eventT("time")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-semibold text-primary-900">
+                      {eventTime || eventT("timeUnavailable")}
+                    </dd>
+                  </div>
                 </div>
-              </div>
-            </dl>
+                <div className="grid grid-cols-[20px_1fr] gap-3">
+                  <MapPin
+                    className="mt-0.5 h-5 w-5 text-accent-700"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-400">
+                      {eventT("venue")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-semibold leading-6 text-primary-900">
+                      {eventLocation || eventT("locationUnavailable")}
+                    </dd>
+                  </div>
+                </div>
+              </dl>
+            )}
 
             <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
               <div>
@@ -988,37 +1086,53 @@ export default function TicketBookingCard({
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={openBooking}
-              disabled={bookingUnavailable}
-              className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary-700 px-6 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-800 hover:shadow-md disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600 disabled:shadow-none disabled:hover:translate-y-0"
-            >
-              {soldOut
-                ? eventT("soldOut")
-                : eventHasPassed === true
-                  ? eventT("registrationClosed")
-                  : ticketPrice === null
-                    ? eventT("ticketsUnavailable")
-                    : eventT("buyTicket")}
-              {!bookingUnavailable && <span aria-hidden="true">→</span>}
-            </button>
-
-            <div className="mt-4 flex items-start gap-2.5 rounded-md bg-neutral-100/70 px-3 py-3">
-              <ShieldCheck
-                className="mt-0.5 h-4 w-4 shrink-0 text-primary-600"
-                aria-hidden="true"
-              />
-              <p className="text-xs leading-5 text-neutral-500">
+            {externalTicketUrl ? (
+              <a
+                href={externalTicketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={ctaClassName}
+              >
+                {eventT("buyTicket")}
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={openBooking}
+                disabled={bookingUnavailable}
+                className={ctaClassName}
+              >
                 {soldOut
-                  ? eventT("soldOutNote")
+                  ? eventT("soldOut")
                   : eventHasPassed === true
-                    ? eventT("eventEndedNote")
+                    ? eventT("registrationClosed")
                     : ticketPrice === null
-                      ? eventT("priceUnavailableNote")
-                      : eventT("checkoutNote")}
-              </p>
-            </div>
+                      ? eventT("ticketsUnavailable")
+                      : eventT("buyTicket")}
+                {!bookingUnavailable && <span aria-hidden="true">→</span>}
+              </button>
+            )}
+
+            {/* The stored notes describe this site's own checkout, so none of
+                them fit an event that sells somewhere else. */}
+            {!externalTicketUrl && (
+              <div className="mt-4 flex items-start gap-2.5 rounded-md bg-neutral-100/70 px-3 py-3">
+                <ShieldCheck
+                  className="mt-0.5 h-4 w-4 shrink-0 text-primary-600"
+                  aria-hidden="true"
+                />
+                <p className="text-xs leading-5 text-neutral-500">
+                  {soldOut
+                    ? eventT("soldOutNote")
+                    : eventHasPassed === true
+                      ? eventT("eventEndedNote")
+                      : ticketPrice === null
+                        ? eventT("priceUnavailableNote")
+                        : eventT("checkoutNote")}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
