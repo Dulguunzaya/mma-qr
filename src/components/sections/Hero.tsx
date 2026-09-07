@@ -73,13 +73,18 @@ export default async function Hero({ locale }: { locale: string }) {
               "radial-gradient(120% 140% at 100% 0%, rgba(63,147,208,0.35), transparent 55%), linear-gradient(125deg, #061a2f 4%, #063457 55%, #105ca8 130%)",
           }}
         />
+        {/*
+          The copy column ends 208px right of centre (600px half-container, less
+          40px of padding, plus its 768px width). Once the screen is wide enough
+          the motif starts 300px after that; below it there is no room, so it
+          keeps bleeding off the right edge as before.
+        */}
         <KnotMark
           aria-hidden="true"
-          preserveAspectRatio="none"
           fill="none"
           stroke="#4FB0FF"
           strokeWidth={10}
-          className="knot-decor absolute -top-[10%] right-[-6%] hidden h-[92%] w-[46vw] max-w-[640px] opacity-50 md:block"
+          className="knot-decor absolute right-[max(-6%,calc(50%_-_1180px))] top-1/2 hidden aspect-[600/580] w-[clamp(20rem,46vw,42rem)] -translate-y-1/2 opacity-50 md:block"
         />
 
         <div className="relative mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24 lg:px-10 lg:py-28">

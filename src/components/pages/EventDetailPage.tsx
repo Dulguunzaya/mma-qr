@@ -244,11 +244,50 @@ function getSessionsFromEntries(data: unknown): EventSession[] {
   });
 }
 
-function getEventSessions(post: Post): EventSession[] {
-  const fromEntries = getSessionsFromEntries(post.customFieldsData);
-  if (fromEntries.length > 0) return fromEntries;
+/** Cyrillic anywhere in a label marks the Mongolian wording of a day. */
+function isCyrillic(text: string | undefined): boolean {
+  return typeof text === "string" && /[\u0400-\u04FF]/.test(text);
+}
 
-  return getSessionsFromMap(post.customFieldsMap);
+/**
+ * Custom fields are not translated: both language versions of a post read the
+ * same groups. A day written up twice — once in Mongolian, once in English —
+ * therefore arrives as two groups sharing one date. Keep the wording that
+ * matches the language being read, and leave a date alone when only one
+ * wording exists or when the day genuinely holds several sessions.
+ */
+function pickSessionsForLocale(
+  sessions: EventSession[],
+  locale: string,
+): EventSession[] {
+  const wantsCyrillic = locale === "mn";
+  const matchesLocale = (session: EventSession) =>
+    isCyrillic(session.title) || isCyrillic(session.location)
+      ? wantsCyrillic
+      : !wantsCyrillic;
+
+  const datesWithMatch = new Set(
+    sessions
+      .filter((session) => session.date && matchesLocale(session))
+      .map((session) => session.date),
+  );
+
+  return sessions.filter(
+    (session) =>
+      !session.date ||
+      !datesWithMatch.has(session.date) ||
+      matchesLocale(session),
+  );
+}
+
+function getEventSessions(post: Post, locale: string): EventSession[] {
+  const fromEntries = getSessionsFromEntries(post.customFieldsData);
+  const sessions =
+    fromEntries.length > 0
+      ? fromEntries
+      : getSessionsFromMap(post.customFieldsMap);
+
+  return pickSessionsForLocale(sessions, locale);
 }
 
 export default async function EventDetailPage({
@@ -280,7 +319,7 @@ export default async function EventDetailPage({
       "address",
     ]),
   );
-  const sessions = getEventSessions(post);
+  const sessions = getEventSessions(post, locale);
   const ticketUrl = getTicketUrl(post);
   const soldOut = findFirstCustomField(customFields, ["soldout"]) === true;
   const termsPage = await getPageBySlug("nuhtsul", locale);

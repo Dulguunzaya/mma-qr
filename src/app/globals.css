@@ -129,6 +129,8 @@ iframe {
 .knot-decor {
   mix-blend-mode: screen;
   pointer-events: none;
+  /* The unlayered img/svg guard above would otherwise beat its width. */
+  max-width: none;
 }
 
 /* ---------------------------------------------------------------------------

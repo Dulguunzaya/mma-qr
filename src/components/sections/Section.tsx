@@ -16,10 +16,19 @@ const TONE_CLASS: Record<SectionTone, string> = {
   dark: "bg-primary-900 text-white",
 };
 
+/**
+ * Each placement is anchored to an edge and then shifted by a share of the
+ * motif's own height, so it sits the same way whatever the section grows to.
+ *
+ * The right offset bleeds off the edge on a normal screen, but once the
+ * 1200px container stops growing it follows the container instead — past a
+ * wide viewport's corner the motif would otherwise sit in a corner of its
+ * own, far from anything it decorates.
+ */
 const DECOR_CLASS: Record<DecorPlacement, string> = {
-  hero: "-top-[10%] right-[-6%] h-[92%] opacity-50",
-  high: "-top-[22%] right-[-14%] h-[130%] opacity-35",
-  low: "-top-[30%] right-[-16%] h-[140%] opacity-30",
+  hero: "top-1/2 right-[max(-6%,calc(50%_-_280px))] w-[clamp(20rem,46vw,42rem)] -translate-y-1/2 opacity-50",
+  high: "top-0 right-[max(-14%,calc(50%_-_840px))] w-[clamp(22rem,52vw,46rem)] -translate-y-[15%] opacity-35",
+  low: "bottom-0 right-[max(-16%,calc(50%_-_880px))] w-[clamp(24rem,56vw,50rem)] translate-y-[15%] opacity-30",
 };
 
 interface SectionProps {
@@ -66,12 +75,11 @@ export function Section({
           {decor && (
             <KnotMark
               aria-hidden="true"
-              preserveAspectRatio="none"
               fill="none"
               stroke="#4FB0FF"
               strokeWidth={10}
               className={cn(
-                "knot-decor absolute hidden w-[46vw] max-w-[640px] md:block",
+                "knot-decor absolute hidden aspect-[600/580] md:block",
                 DECOR_CLASS[decor]
               )}
             />
