@@ -200,11 +200,13 @@ function isLabelValue(value: unknown): value is string {
  * and at most those two labels, which is enough to tell where one day ends and
  * the next begins.
  */
-function getSessionsFromEntries(data: unknown): EventSession[] {
+type FieldBucket = { date?: string; labels: string[] };
+
+function getEntryBuckets(data: unknown): FieldBucket[] {
   if (!Array.isArray(data)) return [];
 
-  const buckets: Array<{ date?: string; labels: string[] }> = [];
-  let current: { date?: string; labels: string[] } | null = null;
+  const buckets: FieldBucket[] = [];
+  let current: FieldBucket | null = null;
 
   for (const entry of data as Array<{ value?: unknown }>) {
     const value = entry?.value;
@@ -212,12 +214,12 @@ function getSessionsFromEntries(data: unknown): EventSession[] {
     const label = !date && isLabelValue(value) ? value.trim() : undefined;
     if (!date && !label) continue;
 
-    const startsNewDay =
+    const startsNewGroup =
       !current ||
       (date !== undefined && current.date !== undefined) ||
       (label !== undefined && current.labels.length >= 2);
 
-    if (startsNewDay) {
+    if (startsNewGroup) {
       current = { labels: [] };
       buckets.push(current);
     }
@@ -226,13 +228,19 @@ function getSessionsFromEntries(data: unknown): EventSession[] {
     else if (label) current!.labels.push(label);
   }
 
-  const sessions = buckets
+  return buckets;
+}
+
+function getSessionsFromEntries(data: unknown): EventSession[] {
+  // A day is only a day once it carries a date. Anything else the CMS holds
+  // in the same field list — the ticket notes, say — is read separately.
+  const sessions = getEntryBuckets(data)
+    .filter((bucket) => bucket.date)
     .map((bucket) => ({
       title: bucket.labels[0],
       date: bucket.date,
       location: bucket.labels[1],
-    }))
-    .filter((session) => session.date || session.location);
+    }));
 
   // A removed group can leave a duplicate day behind; show each one once.
   const seen = new Set<string>();
@@ -242,6 +250,17 @@ function getSessionsFromEntries(data: unknown): EventSession[] {
     seen.add(key);
     return true;
   });
+}
+
+/**
+ * The CMS keeps its ticket notes ("Тайлбар") as plain text fields alongside
+ * the days. They carry no date, so whatever is left once the days are taken
+ * out is the note list, in the order the CMS shows it.
+ */
+function getTicketNotes(post: Post): string[] {
+  return getEntryBuckets(post.customFieldsData)
+    .filter((bucket) => !bucket.date)
+    .flatMap((bucket) => bucket.labels);
 }
 
 /** Cyrillic anywhere in a label marks the Mongolian wording of a day. */
@@ -320,6 +339,7 @@ export default async function EventDetailPage({
     ]),
   );
   const sessions = getEventSessions(post, locale);
+  const ticketNotes = getTicketNotes(post);
   const ticketUrl = getTicketUrl(post);
   const soldOut = findFirstCustomField(customFields, ["soldout"]) === true;
   const termsPage = await getPageBySlug("nuhtsul", locale);
@@ -404,6 +424,7 @@ export default async function EventDetailPage({
             maxQuantity={maxQuantity}
             personalBillingPipelineId={PERSONAL_BILLING_PIPELINE_ID}
             sessions={sessions}
+            ticketNotes={ticketNotes}
             ticketUrl={ticketUrl}
             soldOut={soldOut}
             termsLabel={termsLabel}

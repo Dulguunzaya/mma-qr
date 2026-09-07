@@ -249,6 +249,8 @@ interface TicketBookingCardProps {
   maxQuantity: number;
   personalBillingPipelineId: string;
   sessions?: EventSession[];
+  /** Ticket wording written in the CMS, one line per note. */
+  ticketNotes?: string[];
   /** When set, the call to action opens this instead of the booking form. */
   ticketUrl?: string;
   eventSlug: string;
@@ -337,6 +339,7 @@ export default function TicketBookingCard({
   maxQuantity,
   personalBillingPipelineId,
   sessions = [],
+  ticketNotes = [],
   ticketUrl,
   eventSlug,
   locale,
@@ -1047,6 +1050,22 @@ export default function TicketBookingCard({
               </dl>
             )}
 
+            {ticketNotes.length > 0 && (
+              <ul className="mt-5 space-y-2">
+                {ticketNotes.map((note) => (
+                  <li
+                    key={note}
+                    className="text-[12px] font-medium leading-6 text-primary-900"
+                  >
+                    {note}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {/* Quantity and subtotal only mean something when the ticket is
+                bought here; an outside seller takes both on its own page. */}
+            {!externalTicketUrl && (
             <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">
@@ -1085,6 +1104,7 @@ export default function TicketBookingCard({
                 </p>
               </div>
             </div>
+            )}
 
             {externalTicketUrl ? (
               <a
