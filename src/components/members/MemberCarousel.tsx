@@ -184,6 +184,10 @@ export function MemberCarousel({
   /** Brings a card to the front slot — the click and keyboard path. */
   function focusCard(index: number) {
     velocity.current = 0;
+    // The body below swaps over straight away, so a reader who picks a card
+    // is not left waiting for the ring to finish settling.
+    activeRef.current = index;
+    setActiveIndex(index);
     const current = rotation.current;
     // Pick the equivalent angle nearest the current rotation, so the ring
     // never spins the long way round.
