@@ -685,3 +685,31 @@ iframe {
   color: var(--color-neutral-500);
   font-style: italic;
 }
+
+/* Navy sections need the same CMS rhythm with a light-on-dark palette. */
+.cms-content--invert {
+  color: rgb(255 255 255 / 0.82);
+}
+
+.cms-content--invert h2,
+.cms-content--invert h3,
+.cms-content--invert h4 {
+  color: #ffffff;
+}
+
+.cms-content--invert strong {
+  color: #ffffff;
+}
+
+.cms-content--invert a {
+  color: var(--color-accent-200);
+}
+
+.cms-content--invert blockquote {
+  border-left-color: var(--color-highlight);
+  color: rgb(255 255 255 / 0.7);
+}
+
+.cms-content--invert hr {
+  border-color: rgb(255 255 255 / 0.18);
+}

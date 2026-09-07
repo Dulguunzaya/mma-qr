@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getPageBySlug, getPages, getPosts } from "@/gql/server";
 import type { Post } from "@/gql/types";
-import { getPlainText, getSubheader, NON_ROUTE_PAGE_SLUGS } from "@/lib/content";
+import {
+  getPlainText,
+  getSubheader,
+  NON_ROUTE_PAGE_SLUGS,
+  sanitizeCmsHtml,
+} from "@/lib/content";
 import { routing } from "@/i18n/routing";
 import { PageHero } from "@/components/sections/PageHero";
 import { HubPageHero } from "@/components/sections/HubPageHero";
@@ -79,7 +84,17 @@ function HubContent({
 }) {
   if (!hub || posts.length === 0) return null;
   if (hub === "members") {
-    return <MemberCarousel posts={posts} badge={memberBadge} />;
+    // The ring writes out the body of whichever card is at the front, so the
+    // CMS HTML is sanitised here and handed over ready to paint.
+    return (
+      <MemberCarousel
+        posts={posts.map((post) => ({
+          ...post,
+          contentHtml: post.content ? sanitizeCmsHtml(post.content) : undefined,
+        }))}
+        badge={memberBadge}
+      />
+    );
   }
 
   if (hub === "international") {
