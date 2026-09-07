@@ -4,6 +4,7 @@ import { getPageBySlug } from "@/gql/server";
 import { getSubheader } from "@/lib/content";
 import { PageHero } from "@/components/sections/PageHero";
 import LeadForm from "@/components/forms/LeadForm";
+import { Section } from "@/components/sections/Section";
 
 export async function generateMetadata({
   params,
@@ -36,7 +37,7 @@ export default async function ContactPage({
         eyebrow={getSubheader(page)}
         description={page?.content}
       />
-      <div className="mx-auto max-w-[1200px] px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:px-10">
+      <Section tone="light" containerClassName="py-12 sm:py-16">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <address className="flex flex-col gap-3 text-sm not-italic text-neutral-600">
@@ -55,7 +56,7 @@ export default async function ContactPage({
             <LeadForm />
           </div>
         </div>
-      </div>
+      </Section>
     </>
   );
 }

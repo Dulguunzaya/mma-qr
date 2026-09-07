@@ -5,6 +5,7 @@ import { getSubheader } from "@/lib/content";
 import { HubPageHero } from "@/components/sections/HubPageHero";
 import { CmsSectionHeading } from "@/components/sections/CmsSectionHeading";
 import NewsList from "@/components/NewsList";
+import { Section } from "@/components/sections/Section";
 
 export async function generateMetadata({
   params,
@@ -45,13 +46,15 @@ export default async function NewsPage({
         itemLabel={t("collectionLabel")}
         browseLabel={t("browseLabel")}
       />
-      <section
+      <Section
+        tone="light"
         id="page-content"
-        className="mx-auto max-w-[1200px] scroll-mt-24 px-4 pb-14 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:px-10"
+        className="scroll-mt-24"
+        containerClassName="py-14 sm:py-20"
       >
         <CmsSectionHeading slug="news-listing" locale={locale} />
         <NewsList posts={posts} />
-      </section>
+      </Section>
     </>
   );
 }

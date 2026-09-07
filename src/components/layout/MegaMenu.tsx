@@ -11,6 +11,9 @@ import {
 import { cn } from "@/lib/utils";
 import { NavItemLink } from "./NavItemLink";
 
+const NAV_ACTIVE_CLASS =
+  "bg-primary-800 text-white shadow-sm hover:bg-primary-800 hover:text-white";
+
 export function MegaMenu({ entries }: { entries: NavEntry[] }) {
   const t = useTranslations("nav");
   const [open, setOpen] = useState<string | null>(null);
@@ -41,7 +44,7 @@ export function MegaMenu({ entries }: { entries: NavEntry[] }) {
         if (!event.currentTarget.contains(event.relatedTarget)) setOpen(null);
       }}
     >
-      <ul className="flex items-center gap-1">
+      <ul className="flex items-center gap-0.5">
         {entries.map(({ item, children }) => {
           const hasChildren = children.length > 0;
           const hasMoreChildren =
@@ -65,9 +68,10 @@ export function MegaMenu({ entries }: { entries: NavEntry[] }) {
               <div className="flex items-center">
                 <NavItemLink
                   item={item}
+                  activeClassName={NAV_ACTIVE_CLASS}
                   className={cn(
-                    "group relative px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:text-primary-700",
-                    isOpen && "text-primary-700"
+                    "group relative whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-medium text-primary-900/75 transition-colors hover:bg-primary-50 hover:text-primary-800 xl:px-4 xl:text-sm",
+                    isOpen && "bg-primary-50 text-primary-800"
                   )}
                 />
                 {hasChildren && (
@@ -78,7 +82,7 @@ export function MegaMenu({ entries }: { entries: NavEntry[] }) {
                     aria-controls={`submenu-${item._id}`}
                     aria-label={`${item.label ?? ""} ${t("menu")}`}
                     onClick={() => setOpen(isOpen ? null : item._id)}
-                    className="-ml-2 rounded p-1 text-neutral-500 transition-colors hover:text-primary-700"
+                    className="-ml-1.5 rounded-full p-1 text-neutral-400 transition-colors hover:text-primary-700"
                   >
                     <ChevronDown
                       className={cn(
@@ -93,7 +97,7 @@ export function MegaMenu({ entries }: { entries: NavEntry[] }) {
               {hasChildren && isOpen && (
                 <div
                   id={`submenu-${item._id}`}
-                  className="absolute left-0 top-full z-50 w-80 rounded-lg border border-neutral-200 bg-white p-2 shadow-lg"
+                  className="absolute left-0 top-full z-50 mt-3 w-80 rounded-2xl border border-neutral-200 bg-white p-2 shadow-lg"
                 >
                   <ul className="flex flex-col">
                     {visibleChildren.map((child) => (
@@ -101,7 +105,8 @@ export function MegaMenu({ entries }: { entries: NavEntry[] }) {
                         <NavItemLink
                           item={child}
                           onClick={() => setOpen(null)}
-                          className="block rounded-md px-3 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
+                          activeClassName="bg-primary-50 text-primary-800"
+                          className="block rounded-xl px-3 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
                         />
                       </li>
                     ))}
@@ -110,7 +115,7 @@ export function MegaMenu({ entries }: { entries: NavEntry[] }) {
                         <Link
                           href={item.url ?? "/"}
                           onClick={() => setOpen(null)}
-                          className="flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-50"
+                          className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-50"
                         >
                           {t("seeAll")}
                           <ArrowRight className="h-4 w-4" aria-hidden="true" />

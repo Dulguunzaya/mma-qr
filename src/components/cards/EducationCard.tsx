@@ -33,8 +33,8 @@ export function EducationCard({
             <span className="font-sans text-[11px] font-medium uppercase tracking-[0.14em] text-accent-300">
               {t("featured")}
             </span>
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-accent-500 text-white transition-transform duration-200 group-hover:-translate-y-1">
-              <GraduationCap className="h-5 w-5" aria-hidden="true" />
+            <span className="inline-flex h-[50px] w-[50px] items-center justify-center rounded-[14px] bg-accent-500 text-white transition-[rotate,scale] duration-500 ease-brand group-hover:-rotate-[8deg] group-hover:scale-105">
+              <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </span>
           </div>
           <h3 className="mt-10 max-w-md [overflow-wrap:anywhere] font-sans text-xl font-semibold leading-tight text-white sm:mt-12 sm:text-3xl">
@@ -55,7 +55,7 @@ export function EducationCard({
             )}
             <span className="inline-flex items-center gap-2 text-sm font-medium text-accent-300">
               {t("readMore")}
-              <span className="transition-transform duration-200 group-hover:translate-x-1">
+              <span className="transition-[translate] duration-500 ease-brand group-hover:translate-x-1">
                 →
               </span>
             </span>
@@ -66,10 +66,10 @@ export function EducationCard({
   }
 
   return (
-    <article className="group flex h-full flex-col rounded-lg border border-neutral-200 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-300 hover:shadow-md">
+    <article className="group flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-6 transition-[translate,box-shadow,border-color] duration-500 ease-brand hover:-translate-y-1.5 hover:border-transparent hover:shadow-lg sm:p-7">
       <Link href={`/education/${post.slug}`} className="flex h-full flex-col">
-        <span className="mb-5 inline-flex h-9 w-9 items-center justify-center rounded-md bg-accent-50 text-accent-700 transition-colors group-hover:bg-accent-500 group-hover:text-white">
-          <GraduationCap className="h-4 w-4" aria-hidden="true" />
+        <span className="mb-5 inline-flex h-[50px] w-[50px] items-center justify-center rounded-[14px] bg-primary-50 text-primary-600 transition-[background-color,color,rotate,scale] duration-500 ease-brand group-hover:-rotate-[8deg] group-hover:scale-105 group-hover:bg-primary-900 group-hover:text-white">
+          <GraduationCap className="h-6 w-6" aria-hidden="true" />
         </span>
         <h3 className="font-sans text-base font-medium leading-snug text-neutral-800 transition-colors group-hover:text-primary-700">
           {post.title}
@@ -89,7 +89,7 @@ export function EducationCard({
           )}
           <span className="inline-flex items-center gap-2 text-sm font-medium text-primary-600 transition-colors group-hover:text-accent-700">
             {t("readMore")}
-            <span className="transition-transform duration-200 group-hover:translate-x-1">
+            <span className="transition-[translate] duration-500 ease-brand group-hover:translate-x-1">
               →
             </span>
           </span>

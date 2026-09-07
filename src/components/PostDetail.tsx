@@ -2,6 +2,7 @@ import { Link } from "@/i18n/routing";
 import PostImage from "@/components/common/PostImage";
 import type { Post } from "@/gql/types";
 import { CmsContent } from "@/components/CmsContent";
+import { DriftField } from "@/components/common/DriftField";
 import { formatDate } from "@/lib/date";
 
 interface PostDetailProps {
@@ -23,7 +24,9 @@ export function PostDetail({
   const formattedDate = formatDate(date);
 
   return (
-    <article className="mx-auto max-w-[820px] px-4 py-10 sm:px-6 sm:py-16 lg:px-10">
+    <div className="relative overflow-hidden bg-white">
+      <DriftField />
+      <article className="relative mx-auto max-w-[820px] px-4 py-10 sm:px-6 sm:py-16 lg:px-10">
       <div>
         <Link
           href={backHref}
@@ -58,7 +61,7 @@ export function PostDetail({
           fill
           sizes="(max-width: 820px) 100vw, 820px"
           className="object-cover"
-          containerClassName="relative mt-8 aspect-[16/9] overflow-hidden rounded-lg bg-primary-50"
+          containerClassName="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl bg-primary-50"
           priority
         />
 
@@ -73,7 +76,7 @@ export function PostDetail({
                 fill
                 sizes="(max-width: 640px) 100vw, 400px"
                 className="object-cover"
-                containerClassName="relative aspect-[16/10] overflow-hidden rounded-lg bg-primary-50"
+                containerClassName="relative aspect-[16/10] overflow-hidden rounded-2xl bg-primary-50"
               />
             ))}
           </div>
@@ -81,6 +84,7 @@ export function PostDetail({
 
         <CmsContent html={post.content} className="mt-10" />
       </div>
-    </article>
+      </article>
+    </div>
   );
 }

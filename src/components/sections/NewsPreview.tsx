@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { getPosts } from "@/gql/server";
 import { NewsCard } from "@/components/cards/NewsCard";
+import { Reveal } from "@/components/common/Reveal";
 import { CmsSectionHeading } from "./CmsSectionHeading";
+import { Section } from "./Section";
 
 export default async function NewsPreview({ locale }: { locale: string }) {
   const t = await getTranslations({ locale, namespace: "sections" });
@@ -11,7 +13,7 @@ export default async function NewsPreview({ locale }: { locale: string }) {
   const [featuredPost, ...secondaryPosts] = posts;
 
   return (
-    <section className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10">
+    <Section tone="light">
       <CmsSectionHeading
         slug="news-preview"
         locale={locale}
@@ -19,15 +21,20 @@ export default async function NewsPreview({ locale }: { locale: string }) {
         viewAllLabel={t("news.viewAll")}
       />
       <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <NewsCard post={featuredPost} featured />
+        <Reveal className="h-full">
+          <NewsCard post={featuredPost} featured />
+        </Reveal>
         {secondaryPosts.length > 0 && (
-          <div className="rounded-lg border border-neutral-200 bg-white px-5 sm:px-6">
+          <Reveal
+            delay={110}
+            className="rounded-2xl border border-neutral-200 bg-white px-5 sm:px-6"
+          >
             {secondaryPosts.map((post) => (
               <NewsCard key={post._id} post={post} />
             ))}
-          </div>
+          </Reveal>
         )}
       </div>
-    </section>
+    </Section>
   );
 }

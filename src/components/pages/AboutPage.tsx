@@ -6,6 +6,8 @@ import type { Page, Post } from "@/gql/types";
 import { getPageBySlug } from "@/gql/server";
 import { getPlainText, getSubheader } from "@/lib/content";
 import { CmsContent } from "@/components/CmsContent";
+import { Section } from "@/components/sections/Section";
+import { cn } from "@/lib/utils";
 
 const VALUE_ICONS: LucideIcon[] = [Compass, Target, ShieldCheck, Users];
 
@@ -31,10 +33,29 @@ type AboutPageProps = {
   presidentDates: Post[];
 };
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
+type HeadingTone = "light" | "dark";
+
+function Eyebrow({
+  children,
+  tone = "light",
+}: {
+  children: React.ReactNode;
+  tone?: HeadingTone;
+}) {
   return (
-    <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-accent-700">
-      <span className="h-px w-8 bg-accent-500" aria-hidden="true" />
+    <p
+      className={cn(
+        "flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em]",
+        tone === "dark" ? "text-accent-300" : "text-accent-700"
+      )}
+    >
+      <span
+        className={cn(
+          "h-px w-8",
+          tone === "dark" ? "bg-accent-300" : "bg-accent-500"
+        )}
+        aria-hidden="true"
+      />
       {children}
     </p>
   );
@@ -44,19 +65,31 @@ function SectionHeading({
   label,
   title,
   description,
+  tone = "light",
 }: {
   label: string;
   title: string;
   description?: string;
+  tone?: HeadingTone;
 }) {
   return (
     <div>
-      <Eyebrow>{label}</Eyebrow>
-      <h2 className="mt-3 text-2xl font-semibold leading-tight text-primary-900 sm:text-3xl">
+      <Eyebrow tone={tone}>{label}</Eyebrow>
+      <h2
+        className={cn(
+          "mt-3 text-2xl font-semibold leading-tight sm:text-3xl",
+          tone === "dark" ? "text-white" : "text-primary-900"
+        )}
+      >
         {title}
       </h2>
       {description && (
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-neutral-500">
+        <p
+          className={cn(
+            "mt-4 max-w-2xl text-sm leading-7",
+            tone === "dark" ? "text-primary-100/85" : "text-neutral-500"
+          )}
+        >
           {description}
         </p>
       )}
@@ -79,7 +112,7 @@ function PersonImage({ person, size }: { person: AboutPerson; size: string }) {
 function LeadershipRow({ person }: { person: AboutPerson }) {
   return (
     <article className="group flex items-center gap-4 border-b border-neutral-200 py-4 last:border-b-0">
-      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-neutral-100 ring-1 ring-neutral-200 transition-colors duration-200 group-hover:ring-accent-300">
+      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-200 transition-colors duration-200 group-hover:ring-accent-300">
         <PersonImage person={person} size="64px" />
       </div>
       <div>
@@ -94,8 +127,8 @@ function LeadershipRow({ person }: { person: AboutPerson }) {
 
 function ManagementCard({ person }: { person: AboutPerson }) {
   return (
-    <article className="group flex min-h-28 items-center gap-4 rounded-lg border border-neutral-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-300 hover:shadow-md">
-      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-neutral-100 ring-1 ring-neutral-200">
+    <article className="group flex min-h-28 items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-300 hover:shadow-md">
+      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-200">
         <PersonImage person={person} size="64px" />
       </div>
       <div className="min-w-0">
@@ -225,7 +258,7 @@ export default async function AboutPage({
 
   return (
     <>
-      <div className="mx-auto max-w-[1200px] px-4 pt-10 sm:px-6 sm:pt-16 lg:px-10">
+      <Section tone="mist" containerClassName="py-10 sm:py-16">
         <div className="max-w-3xl">
           <div className="flex min-w-0 items-center gap-3 sm:gap-6">
             <span
@@ -240,16 +273,16 @@ export default async function AboutPage({
             {getSubheader(page)}
           </p>
         </div>
-      </div>
+      </Section>
 
-      <section className="mx-auto max-w-[1200px] px-4 pb-14 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:px-10">
+      <Section tone="light" containerClassName="pb-14 pt-12 sm:pb-20 sm:pt-16">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <SectionHeading
               label={page.name ?? ""}
               title={purpose.name ?? ""}
             />
-            <div className="relative mt-8 aspect-[4/3] overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
+            <div className="relative mt-8 aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
               <NextImage
                 src="/images/about/about-purpose.jpg"
                 alt={t("purposeImageAlt")}
@@ -274,10 +307,10 @@ export default async function AboutPage({
                 return (
                   <article
                     key={value._id}
-                    className="group flex flex-col rounded-lg border border-neutral-200 bg-white p-5 transition-colors duration-200 hover:border-accent-300"
+                    className="group flex flex-col rounded-2xl border border-neutral-200 bg-white p-5 transition-colors duration-200 hover:border-accent-300"
                   >
                     <div className="flex items-center justify-between gap-4">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-md bg-accent-50 text-accent-700 transition-colors duration-200 group-hover:bg-accent-100">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-50 text-accent-700 transition-colors duration-200 group-hover:bg-accent-100">
                         <Icon className="h-5 w-5" aria-hidden="true" />
                       </span>
                       <span className="text-xs font-semibold text-accent-700">
@@ -298,11 +331,10 @@ export default async function AboutPage({
             </div>
           </div>
         )}
-      </section>
+      </Section>
 
       {directions.length > 0 && (
-        <section className="border-y border-neutral-200 bg-neutral-100/50">
-          <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20 lg:px-10">
+        <Section tone="mist" containerClassName="py-12 sm:py-20">
             <SectionHeading
               label={getSubheader(directionsPage) ?? ""}
               title={directionsPage?.name ?? ""}
@@ -311,7 +343,7 @@ export default async function AboutPage({
               {directions.map((direction, index) => (
                 <li
                   key={direction._id}
-                  className="grid grid-cols-[48px_1fr] gap-4 rounded-lg border border-neutral-200 bg-white p-5 last:sm:col-span-2"
+                  className="grid grid-cols-[48px_1fr] gap-4 rounded-2xl border border-neutral-200 bg-white p-5 last:sm:col-span-2"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full border border-accent-300 text-xs font-semibold text-accent-700">
                     {String(index + 1).padStart(2, "0")}
@@ -329,20 +361,19 @@ export default async function AboutPage({
                 </li>
               ))}
             </ol>
-          </div>
-        </section>
+        </Section>
       )}
 
       {history.length > 0 && (
-        <section className="border-b border-neutral-200 bg-background">
-          <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20 lg:px-10">
+        <Section tone="dark" decor="low" containerClassName="py-12 sm:py-20">
             <div className="grid gap-6 lg:grid-cols-[0.45fr_0.55fr] lg:items-end lg:gap-16">
               <SectionHeading
                 label={getSubheader(historyPage) ?? ""}
                 title={historyPage?.name ?? ""}
+                tone="dark"
               />
               <div>
-                <p className="max-w-2xl text-sm leading-7 text-neutral-500">
+                <p className="max-w-2xl text-sm leading-7 text-primary-100/85">
                   {historyPage?.description
                     ? getPlainText(historyPage.description)
                     : ""}
@@ -360,10 +391,10 @@ export default async function AboutPage({
                   {history.map((entry) => (
                     <li
                       key={entry._id}
-                      className="relative flex h-fit w-[min(84vw,360px)] shrink-0 snap-start flex-col rounded-lg border border-neutral-200 bg-white p-5 sm:w-[400px] sm:p-6"
+                      className="relative flex h-fit w-[min(84vw,360px)] shrink-0 snap-start flex-col rounded-2xl border border-neutral-200 bg-white p-5 sm:w-[400px] sm:p-6"
                     >
                       <span
-                        className="absolute -top-[29px] left-6 h-3 w-3 rounded-full border-2 border-neutral-50 bg-accent-500 ring-1 ring-accent-400"
+                        className="absolute -top-[29px] left-6 h-3 w-3 rounded-full border-2 border-primary-900 bg-accent-300 ring-1 ring-accent-200"
                         aria-hidden="true"
                       />
                       <span className="text-xl font-semibold text-accent-700">
@@ -378,14 +409,15 @@ export default async function AboutPage({
                 </ol>
               </div>
             </div>
-          </div>
-        </section>
+        </Section>
       )}
 
       {(presidentPeople.length > 0 || leadershipTeam.length > 0) && (
-        <section
+        <Section
+          tone="light"
           id="leadership"
-          className="scroll-mt-24 mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20 lg:px-10"
+          className="scroll-mt-24"
+          containerClassName="py-12 sm:py-20"
         >
           <SectionHeading
             label={getSubheader(presidentsPage) ?? ""}
@@ -393,8 +425,8 @@ export default async function AboutPage({
           />
           <div className="mt-8 grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
             {currentPresident && (
-              <article className="grid gap-5 rounded-lg border border-neutral-200 bg-white p-4 shadow-sm sm:grid-cols-[220px_1fr]">
-                <div className="relative aspect-square overflow-hidden rounded-lg bg-neutral-100">
+              <article className="grid gap-5 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:grid-cols-[220px_1fr]">
+                <div className="relative aspect-square overflow-hidden rounded-2xl bg-neutral-100">
                   <PersonImage
                     person={currentPresident}
                     size="(max-width: 640px) 100vw, 220px"
@@ -429,7 +461,7 @@ export default async function AboutPage({
                         key={person.id}
                         className="group flex items-center gap-3 border-b border-neutral-200 py-3"
                       >
-                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-neutral-100 ring-1 ring-neutral-200 transition-colors duration-200 group-hover:ring-accent-300">
+                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-200 transition-colors duration-200 group-hover:ring-accent-300">
                           <PersonImage person={person} size="48px" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -463,12 +495,11 @@ export default async function AboutPage({
               )}
             </div>
           </div>
-        </section>
+        </Section>
       )}
 
       {managementPeople.length > 0 && (
-        <section className="border-t border-neutral-200 bg-neutral-100/50">
-          <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-20 lg:px-10">
+        <Section tone="mist" containerClassName="py-12 sm:py-20">
             <SectionHeading
               label={getSubheader(managementPage) ?? ""}
               title={managementPage?.name ?? ""}
@@ -483,8 +514,7 @@ export default async function AboutPage({
                 <ManagementCard key={person.id} person={person} />
               ))}
             </div>
-          </div>
-        </section>
+        </Section>
       )}
     </>
   );

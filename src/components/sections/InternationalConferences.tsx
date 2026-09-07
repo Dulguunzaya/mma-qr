@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { getPosts } from "@/gql/server";
 import { InternationalCard } from "@/components/cards/InternationalCard";
+import { Reveal } from "@/components/common/Reveal";
 import { CmsSectionHeading } from "./CmsSectionHeading";
+import { Section } from "./Section";
 
 export default async function InternationalConferences({
   locale,
@@ -17,20 +19,20 @@ export default async function InternationalConferences({
   if (posts.length === 0) return null;
 
   return (
-    <section className="border-y border-neutral-200 bg-primary-50/50">
-      <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10">
-        <CmsSectionHeading
-          slug="international-conferences"
-          locale={locale}
-          viewAllHref="/international"
-          viewAllLabel={t("international.viewAll")}
-        />
-        <div className="grid gap-px overflow-hidden rounded-lg bg-primary-600 shadow-md sm:grid-cols-2 lg:grid-cols-4">
-          {posts.map((post, index) => (
-            <InternationalCard key={post._id} post={post} index={index} />
-          ))}
-        </div>
+    <Section tone="light">
+      <CmsSectionHeading
+        slug="international-conferences"
+        locale={locale}
+        viewAllHref="/international"
+        viewAllLabel={t("international.viewAll")}
+      />
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {posts.map((post, index) => (
+          <Reveal key={post._id} className="h-full" delay={index * 80}>
+            <InternationalCard post={post} index={index} />
+          </Reveal>
+        ))}
       </div>
-    </section>
+    </Section>
   );
 }

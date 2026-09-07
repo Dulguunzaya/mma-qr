@@ -19,8 +19,10 @@ export function HeaderAuth({ mobile = false, onNavigate }: HeaderAuthProps) {
     return (
       <span
         className={cn(
-          "h-9 animate-pulse rounded-md bg-neutral-100",
-          mobile ? "block w-full" : "hidden w-20 sm:block",
+          "animate-pulse bg-neutral-100",
+          mobile
+            ? "block h-9 w-full rounded-md"
+            : "hidden h-10 w-28 rounded-full sm:block",
         )}
         aria-hidden="true"
       />
@@ -32,10 +34,10 @@ export function HeaderAuth({ mobile = false, onNavigate }: HeaderAuthProps) {
       href={user ? "/account" : "/login"}
       onClick={onNavigate}
       className={cn(
-        "items-center gap-2 rounded-md text-sm font-medium text-neutral-700 hover:bg-neutral-100",
+        "items-center gap-2",
         mobile
-          ? "flex min-h-11 w-full px-4 py-3"
-          : "hidden px-3 py-2 sm:flex",
+          ? "flex min-h-11 w-full rounded-md px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-100"
+          : "hidden h-10 whitespace-nowrap rounded-full bg-primary-900 px-4 text-[13px] font-semibold text-white transition-colors hover:bg-primary-800 sm:flex xl:px-5 xl:text-sm",
       )}
     >
       <CircleUserRound className={mobile ? "h-5 w-5" : "h-4 w-4"} />

@@ -1,9 +1,13 @@
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Image from "@/components/common/Image";
+import { KnotMark } from "@/components/common/KnotMark";
+import { Reveal } from "@/components/common/Reveal";
 import { Link } from "@/i18n/routing";
 import { getPageBySlug, getPosts } from "@/gql/server";
 import type { Page } from "@/gql/types";
 import { getPlainText, getSubheader } from "@/lib/content";
+import { Section } from "./Section";
 
 const TICKET_TAG_ID = "K7wiTmtaz4S_k7tvT56Jb";
 
@@ -49,82 +53,122 @@ export default async function Hero({ locale }: { locale: string }) {
     getCmsStat(page, "bottom") ?? getCmsStat(sourcePage, "bottom") ?? undefined;
 
   return (
-    <section className="relative overflow-hidden border-b border-neutral-200">
-      {page?.thumbnail?.url && (
-        <Image
-          src={page.thumbnail.url}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
+    <>
+      <section className="relative -mt-[88px] overflow-hidden bg-primary-900 pt-[88px] text-white">
+        {page?.thumbnail?.url && (
+          <Image
+            src={page.thumbnail.url}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        )}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 140% at 100% 0%, rgba(63,147,208,0.35), transparent 55%), linear-gradient(125deg, #061a2f 4%, #063457 55%, #105ca8 130%)",
+          }}
         />
-      )}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(90deg, var(--color-bg-cream) 0%, rgba(250,250,248,0.97) 48%, rgba(250,250,248,0.58) 72%, rgba(250,250,248,0.14) 100%)",
-        }}
-      />
-      <div className="relative mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10 lg:py-28">
-        <div>
-          {eyebrow && (
-            <p className="flex items-center gap-3 font-sans text-xs font-medium uppercase tracking-[0.12em] text-accent-600">
-              <span className="h-px w-8 bg-accent-500" aria-hidden="true" />
-              {eyebrow}
-            </p>
-          )}
-          <h1 className="mt-5 max-w-5xl [overflow-wrap:anywhere] font-sans text-[clamp(2rem,9vw,3.75rem)] font-semibold leading-[1.1] tracking-tight text-primary-900">
-            {headline}
-          </h1>
-          {subhead && (
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-neutral-500">{subhead}</p>
-          )}
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/join-as-a-member"
-              className="inline-flex h-12 items-center justify-center rounded-md bg-primary-700 px-6 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-800 hover:shadow-md"
-            >
-              {t("hero.ctaPrimary")}
-            </Link>
-            <Link
-              href="/events"
-              className="inline-flex h-12 items-center justify-center rounded-md border border-neutral-300 bg-white/80 px-6 text-sm font-medium text-primary-700 backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-400 hover:text-accent-700"
-            >
-              {t("hero.ctaSecondary")}
-            </Link>
-          </div>
-          {ticketEvent && (
-            <div className="mt-4">
+        <KnotMark
+          aria-hidden="true"
+          preserveAspectRatio="none"
+          fill="none"
+          stroke="#4FB0FF"
+          strokeWidth={10}
+          className="knot-decor absolute -top-[10%] right-[-6%] hidden h-[92%] w-[46vw] max-w-[640px] opacity-50 md:block"
+        />
+
+        <div className="relative mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24 lg:px-10 lg:py-28">
+          <div className="max-w-3xl">
+            {eyebrow && (
+              <p className="flex items-center gap-3 font-sans text-xs font-semibold uppercase tracking-[0.16em] text-accent-300">
+                <span className="h-px w-8 bg-accent-300" aria-hidden="true" />
+                {eyebrow}
+              </p>
+            )}
+            <h1 className="mt-6 [overflow-wrap:anywhere] font-sans text-[clamp(2.25rem,7.5vw,4.75rem)] font-extrabold uppercase leading-[1.06] tracking-[-0.01em] text-white">
+              {headline}
+            </h1>
+            {subhead && (
+              <p className="mt-7 max-w-2xl text-base leading-8 text-primary-100/85 sm:text-lg">
+                {subhead}
+              </p>
+            )}
+            <div className="mt-10 flex flex-col flex-wrap gap-4 sm:flex-row sm:items-center">
               <Link
-                href={`/events/${ticketEvent.slug}`}
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-accent-500 px-5 py-3 text-center text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-md sm:w-auto sm:px-6"
+                href="/join-as-a-member"
+                className="btn-brand inline-flex h-12 items-center justify-center gap-2.5 rounded-full px-6 text-sm font-bold sm:h-14 sm:px-8"
               >
-                {t("hero.ticketCta", { event: ticketEvent.title ?? "" })}
+                {t("hero.ctaPrimary")}
+                <ArrowUpRight
+                  className="btn-arrow-diag h-4 w-4"
+                  aria-hidden="true"
+                />
               </Link>
+              <Link
+                href="/events"
+                className="btn-outline-light inline-flex h-12 items-center justify-center gap-2.5 rounded-full px-6 text-sm font-bold sm:h-14 sm:px-8"
+              >
+                {t("hero.ctaSecondary")}
+                <ArrowRight
+                  className="btn-arrow h-4 w-4"
+                  aria-hidden="true"
+                />
+              </Link>
+              {ticketEvent && (
+                <Link
+                  href={`/events/${ticketEvent.slug}`}
+                  className="btn-outline-light inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full px-6 py-3 text-center text-sm font-bold sm:min-h-14 sm:px-8"
+                >
+                  {t("hero.ticketCta", { event: ticketEvent.title ?? "" })}
+                  <ArrowRight
+                    className="btn-arrow h-4 w-4"
+                    aria-hidden="true"
+                  />
+                </Link>
+              )}
             </div>
-          )}
-          <dl className="mt-10 grid max-w-3xl grid-cols-3 divide-x divide-neutral-200 border-y border-neutral-200 py-5">
-            {HERO_STATS.map(({ id, cmsKey }) => (
-              <div key={id} className="min-w-0 px-2 first:pl-0 last:pr-0 sm:px-4">
-                <dt className="mt-1 text-xs leading-5 text-neutral-500 sm:text-sm">
+          </div>
+        </div>
+      </section>
+
+      <Section
+        tone="light"
+       
+        containerClassName="py-14 sm:py-20"
+      >
+        <div className="grid gap-10 sm:gap-8 lg:grid-cols-4">
+          <dl className="grid gap-10 sm:grid-cols-3 sm:gap-8 lg:col-span-3">
+            {HERO_STATS.map(({ id, cmsKey }, index) => (
+              <Reveal
+                key={id}
+                className="flex min-w-0 flex-col-reverse items-start"
+                delay={index * 90}
+              >
+                <dt className="mt-3.5 max-w-[200px] text-sm leading-6 text-neutral-500">
                   {t(`hero.stats.${id}.label`)}
                 </dt>
-                <dd className="[overflow-wrap:anywhere] font-sans text-lg font-semibold text-primary-800 sm:text-2xl">
+                <dd className="[overflow-wrap:anywhere] font-sans text-[clamp(2.875rem,6vw,4.75rem)] font-extralight leading-none tracking-[-0.02em] text-primary-900">
                   {getCmsStat(page, cmsKey) ?? getCmsStat(sourcePage, cmsKey)}
                 </dd>
-              </div>
+              </Reveal>
             ))}
           </dl>
           {credibility && (
-            <p className="mt-5 max-w-3xl font-sans text-[11px] leading-5 tracking-wide text-neutral-500">
+            <Reveal
+              as="p"
+              delay={270}
+              className="text-sm leading-7 text-neutral-500"
+            >
               {credibility}
-            </p>
+            </Reveal>
           )}
         </div>
-      </div>
-    </section>
+      </Section>
+    </>
   );
 }

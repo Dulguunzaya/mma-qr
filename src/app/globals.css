@@ -87,11 +87,17 @@
   --color-footer-bg: #082b4b;
   --color-footer-fg: #dceaf7;
 
+  /* Badge accent reserved for members-only markers on dark surfaces. */
+  --color-highlight: #f4c43e;
+
   --font-sans: "Manrope", system-ui, sans-serif;
 
   --shadow-sm: 0 1px 2px rgba(16, 19, 21, 0.05);
   --shadow-md: 0 4px 12px rgba(16, 19, 21, 0.07);
   --shadow-lg: 0 12px 32px rgba(16, 19, 21, 0.1);
+
+  /* One easing curve for every brand transition. */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body {
@@ -119,6 +125,440 @@ iframe {
   border-radius: 4px;
 }
 
+/* Decorative brand motif: the knot mark glows rather than greys on navy. */
+.knot-decor {
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Buttons
+
+   Every call to action across the site shares one motion language: a 0.45-0.5s
+   --ease-brand curve, a 4px lift, an arrow that travels, and a background that
+   either wipes in from the left or catches a sweep of light. Size and spacing
+   stay in the markup; only colour and motion live here.
+   --------------------------------------------------------------------------- */
+
+.btn-wipe,
+.btn-outline-light,
+.btn-ghost-dark,
+.btn-sheen,
+.btn-brand {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Wipe: the fill grows from the left edge. --btn-wipe-fill picks the colour so
+   one primitive serves both light and dark surfaces. */
+.btn-wipe::before,
+.btn-outline-light::before,
+.btn-ghost-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-wipe-fill, #ffffff);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--ease-brand);
+}
+
+.btn-wipe:hover::before,
+.btn-wipe:focus-visible::before,
+.btn-outline-light:hover::before,
+.btn-outline-light:focus-visible::before,
+.btn-ghost-dark:hover::before,
+.btn-ghost-dark:focus-visible::before {
+  transform: scaleX(1);
+}
+
+/* Sheen: a band of light sweeps across the face. */
+.btn-sheen::before,
+.btn-brand::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.55) 48%,
+    transparent 66%
+  );
+  background-size: 220% 100%;
+  background-position: 150% 0;
+  transition: background-position 0.75s var(--ease-brand);
+}
+
+.btn-sheen:hover::before,
+.btn-sheen:focus-visible::before,
+.btn-brand:hover::before,
+.btn-brand:focus-visible::before {
+  background-position: -40% 0;
+}
+
+/* The filled primary action. Works on any background. */
+.btn-brand {
+  color: #ffffff;
+  background-image: linear-gradient(
+    to right,
+    var(--color-accent-400) 0%,
+    var(--color-primary-500) 50%,
+    var(--color-accent-400) 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 0;
+  box-shadow: 0 14px 30px -10px rgba(16, 92, 168, 0.55);
+  transition:
+    transform 0.5s var(--ease-brand),
+    box-shadow 0.5s var(--ease-brand),
+    background-position 0.5s var(--ease-brand);
+}
+
+.btn-brand:hover {
+  transform: translateY(-4px);
+  background-position: 100% 0;
+  box-shadow: 0 20px 40px -10px rgba(16, 92, 168, 0.65);
+}
+
+/* Outlined action for navy surfaces: fills white, text flips to navy. */
+.btn-outline-light {
+  --btn-wipe-fill: #ffffff;
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  background: transparent;
+  transition:
+    transform 0.5s var(--ease-brand),
+    color 0.45s var(--ease-brand),
+    border-color 0.45s var(--ease-brand);
+}
+
+.btn-outline-light:hover {
+  transform: translateY(-4px);
+  color: var(--color-primary-900);
+  border-color: #ffffff;
+}
+
+/* Outlined action for light surfaces: fills navy, text flips to white. */
+.btn-ghost-dark {
+  --btn-wipe-fill: var(--color-primary-900);
+  color: var(--color-primary-900);
+  border: 1.5px solid rgba(10, 43, 77, 0.2);
+  background: transparent;
+  transition:
+    transform 0.5s var(--ease-brand),
+    color 0.45s var(--ease-brand),
+    border-color 0.45s var(--ease-brand);
+}
+
+.btn-ghost-dark:hover {
+  transform: translateY(-4px);
+  color: #ffffff;
+  border-color: var(--color-primary-900);
+}
+
+.btn-brand:active,
+.btn-outline-light:active,
+.btn-ghost-dark:active {
+  transform: translateY(-1px);
+}
+
+/* Arrows travel with the button they sit in. */
+.btn-arrow,
+.btn-arrow-diag {
+  flex-shrink: 0;
+  transition: transform 0.45s var(--ease-brand);
+}
+
+:is(.btn-brand, .btn-outline-light, .btn-ghost-dark, .btn-sheen, .btn-wipe):hover
+  .btn-arrow {
+  transform: translateX(4px);
+}
+
+:is(.btn-brand, .btn-outline-light, .btn-ghost-dark, .btn-sheen, .btn-wipe):hover
+  .btn-arrow-diag {
+  transform: translate(4px, -4px) rotate(8deg);
+}
+
+/* Inline text links keep the same arrow motion at a smaller scale. */
+.link-arrow svg {
+  transition: transform 0.35s var(--ease-brand);
+}
+
+.link-arrow:hover svg {
+  transform: translate(4px, -3px);
+}
+
+/* ---------------------------------------------------------------------------
+   Frosted glass panel
+
+   A tinted, blurred pane with a bevelled bright edge. The bevel and the
+   specular sweep carry the effect on flat surfaces, where backdrop-filter has
+   nothing behind it to blur.
+   --------------------------------------------------------------------------- */
+
+.glass-card {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(120, 182, 231, 0.32) 0%,
+      rgba(16, 92, 168, 0.15) 55%,
+      rgba(10, 43, 77, 0.1) 100%
+    );
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 10px 32px -8px rgba(16, 92, 168, 0.28),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(16, 92, 168, 0.18);
+  transition:
+    translate 0.5s var(--ease-brand),
+    box-shadow 0.5s var(--ease-brand),
+    border-color 0.5s var(--ease-brand);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 26px 52px -14px rgba(16, 92, 168, 0.42),
+    inset 0 1px 1px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(16, 92, 168, 0.22);
+}
+
+/* Light striking the top-left corner. */
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    80% 60% at 12% 0%,
+    rgba(255, 255, 255, 0.75),
+    transparent 62%
+  );
+}
+
+/* The tint deepens as the pane is approached. */
+.glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    120% 140% at 100% 0%,
+    rgba(16, 92, 168, 0.24),
+    transparent 62%
+  );
+  transition: opacity 0.5s var(--ease-brand);
+}
+
+.glass-card:hover::after {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Drifting background field
+
+   Soft blue panes that drift slowly behind page content. Each pane carries its
+   own distance, angle, duration and delay through custom properties, so one
+   keyframe serves the whole field and no two panes travel together.
+   --------------------------------------------------------------------------- */
+
+.drift-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.drift-card {
+  position: absolute;
+  border-radius: 32px;
+  filter: blur(22px);
+  animation: drift var(--drift-duration, 26s) var(--drift-delay, 0s)
+    ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  to {
+    translate: var(--drift-x, 40px) var(--drift-y, -50px);
+    rotate: var(--drift-r, 6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift-card {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Rising isometric blocks
+
+   A field of cubes that drift upward and fade, with thin light streaks between
+   them. Each cube is three clipped faces, so the isometric shape needs no 3D
+   transforms and stays crisp at any size.
+   --------------------------------------------------------------------------- */
+
+.rise-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.iso-cube {
+  position: absolute;
+  aspect-ratio: 1 / 1.155;
+  opacity: 0;
+  animation: rise var(--rise-duration, 18s) var(--rise-delay, 0s) linear
+    infinite;
+}
+
+.iso-cube i {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.iso-cube .face-top {
+  background: var(--cube-top);
+  clip-path: polygon(50% 0%, 100% 25%, 50% 50%, 0% 25%);
+}
+
+.iso-cube .face-left {
+  background: var(--cube-left);
+  clip-path: polygon(0% 25%, 50% 50%, 50% 100%, 0% 75%);
+}
+
+.iso-cube .face-right {
+  background: var(--cube-right);
+  clip-path: polygon(50% 50%, 100% 25%, 100% 75%, 50% 100%);
+}
+
+@keyframes rise {
+  0% {
+    translate: 0 70px;
+    opacity: 0;
+  }
+  14% {
+    opacity: var(--rise-opacity, 1);
+  }
+  86% {
+    opacity: var(--rise-opacity, 1);
+  }
+  100% {
+    translate: 0 -170px;
+    opacity: 0;
+  }
+}
+
+.rise-streak {
+  width: 2px;
+  border-radius: 2px;
+  opacity: 0;
+  background: linear-gradient(
+    to top,
+    transparent,
+    rgba(120, 182, 231, 0.5),
+    transparent
+  );
+  animation: streak var(--streak-duration, 10s) var(--streak-delay, 0s) linear
+    infinite;
+}
+
+@keyframes streak {
+  0% {
+    translate: 0 80px;
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    translate: 0 -240px;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iso-cube,
+  .rise-streak {
+    animation: none;
+    opacity: var(--rise-opacity, 1);
+  }
+}
+
+/* A read-more link whose arrow sits in its own ring, as on the shape-led
+   reference layouts. */
+.arrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.arrow-pill .arrow-ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  opacity: 0.55;
+  transition:
+    background-color 0.45s var(--ease-brand),
+    color 0.45s var(--ease-brand),
+    opacity 0.45s var(--ease-brand);
+}
+
+.group:hover .arrow-pill .arrow-ring,
+.arrow-pill:hover .arrow-ring {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.arrow-pill .arrow-ring svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.45s var(--ease-brand);
+}
+
+.group:hover .arrow-pill .arrow-ring svg,
+.arrow-pill:hover .arrow-ring svg {
+  transform: translate(2px, -2px);
+}
+
+/* Fades content in the first time it scrolls into view. */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.8s var(--ease-brand),
+    transform 0.8s var(--ease-brand);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (scripting: none) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -127,6 +567,11 @@ iframe {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
   }
 }
 

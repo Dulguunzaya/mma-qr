@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { getPosts } from "@/gql/server";
 import { EventCard } from "@/components/cards/EventCard";
+import { Reveal } from "@/components/common/Reveal";
 import { CmsSectionHeading } from "./CmsSectionHeading";
+import { Section } from "./Section";
 
 export default async function FlagshipEvents({ locale }: { locale: string }) {
   const t = await getTranslations({ locale, namespace: "sections" });
@@ -10,18 +12,21 @@ export default async function FlagshipEvents({ locale }: { locale: string }) {
   if (posts.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10">
+    <Section tone="dark" decor="high">
       <CmsSectionHeading
         slug="flagship-events"
         locale={locale}
+        tone="dark"
         viewAllHref="/events"
         viewAllLabel={t("flagshipEvents.viewAll")}
       />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {posts.map((post, index) => (
-          <EventCard key={post._id} post={post} index={index} />
+          <Reveal key={post._id} className="h-full" delay={index * 90}>
+            <EventCard post={post} index={index} />
+          </Reveal>
         ))}
       </div>
-    </section>
+    </Section>
   );
 }

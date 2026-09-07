@@ -156,7 +156,7 @@ export default async function EventDetailPage({
               nextLabel={t("nextImage")}
               fallback={
                 <div
-                  className="relative mt-9 flex aspect-[16/9] items-end overflow-hidden rounded-lg bg-primary-800 p-7 sm:p-9"
+                  className="relative mt-9 flex aspect-[16/9] items-end overflow-hidden rounded-2xl bg-primary-800 p-7 sm:p-9"
                   aria-hidden="true"
                 >
                   <div className="absolute -right-20 -top-28 h-80 w-80 rounded-full border border-primary-500" />

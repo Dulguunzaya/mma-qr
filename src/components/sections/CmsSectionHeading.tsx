@@ -5,6 +5,7 @@ import { SectionHeading } from "./SectionHeading";
 interface CmsSectionHeadingProps {
   slug: string;
   locale: string;
+  tone?: "light" | "dark";
   viewAllHref?: string;
   viewAllLabel?: string;
 }
@@ -12,6 +13,7 @@ interface CmsSectionHeadingProps {
 export async function CmsSectionHeading({
   slug,
   locale,
+  tone,
   viewAllHref,
   viewAllLabel,
 }: CmsSectionHeadingProps) {
@@ -23,6 +25,7 @@ export async function CmsSectionHeading({
       label={getSubheader(page) ?? ""}
       title={page.name ?? ""}
       subtitle={page.description ? getPlainText(page.description) : undefined}
+      tone={tone}
       viewAllHref={viewAllHref}
       viewAllLabel={viewAllLabel}
     />

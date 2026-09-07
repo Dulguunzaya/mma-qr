@@ -26,7 +26,7 @@ export default function NewsList({ posts }: { posts: Post[] }) {
       <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
         <NewsCard post={featuredPost} featured />
         {secondaryPosts.length > 0 && (
-          <div className="rounded-lg border border-neutral-200 bg-white px-5 sm:px-6">
+          <div className="rounded-2xl border border-neutral-200 bg-white px-5 sm:px-6">
             {secondaryPosts.map((post) => (
               <NewsCard key={post._id} post={post} />
             ))}
@@ -45,7 +45,7 @@ export default function NewsList({ posts }: { posts: Post[] }) {
               onClick={() => setPage(p)}
               aria-current={p === page ? "page" : undefined}
               className={cn(
-                "flex h-10 min-w-10 items-center justify-center rounded-md px-2 text-sm font-medium transition-colors",
+                "flex h-10 min-w-10 items-center justify-center rounded-xl px-2 text-sm font-medium transition-colors",
                 p === page
                   ? "bg-primary-600 text-white"
                   : "text-neutral-600 hover:bg-neutral-100"

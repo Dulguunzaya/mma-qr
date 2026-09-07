@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { getPosts } from "@/gql/server";
 import { EducationCard } from "@/components/cards/EducationCard";
+import { Reveal } from "@/components/common/Reveal";
 import { CmsSectionHeading } from "./CmsSectionHeading";
+import { Section } from "./Section";
 
 export default async function EducationPrograms({
   locale,
@@ -17,7 +19,7 @@ export default async function EducationPrograms({
   if (posts.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-24 lg:px-10">
+    <Section tone="mist">
       <CmsSectionHeading
         slug="education-programs"
         locale={locale}
@@ -25,10 +27,12 @@ export default async function EducationPrograms({
         viewAllLabel={t("education.viewAll")}
       />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.slice(1).map((post) => (
-          <EducationCard key={post._id} post={post} />
+        {posts.slice(1).map((post, index) => (
+          <Reveal key={post._id} className="h-full" delay={index * 80}>
+            <EducationCard post={post} />
+          </Reveal>
         ))}
       </div>
-    </section>
+    </Section>
   );
 }

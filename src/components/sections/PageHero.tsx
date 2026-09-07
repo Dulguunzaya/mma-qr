@@ -1,4 +1,5 @@
 import { CmsContent } from "@/components/CmsContent";
+import { Section } from "./Section";
 
 interface PageHeroProps {
   title: string;
@@ -8,7 +9,11 @@ interface PageHeroProps {
 
 export function PageHero({ title, eyebrow, description }: PageHeroProps) {
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pt-10 sm:px-6 sm:pt-16 lg:px-10">
+    <Section
+      tone="mist"
+     
+      containerClassName="py-10 sm:py-16"
+    >
       <div className="max-w-3xl">
         {eyebrow && (
           <p className="mb-4 flex items-center gap-3 font-sans text-xs font-medium uppercase tracking-[0.12em] text-accent-600">
@@ -30,6 +35,6 @@ export function PageHero({ title, eyebrow, description }: PageHeroProps) {
           className="mt-5 max-w-2xl text-base leading-7 text-neutral-500 sm:ml-[5.5rem]"
         />
       </div>
-    </div>
+    </Section>
   );
 }

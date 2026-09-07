@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { Lock } from "lucide-react";
 import { getPageBySlug, getPages, getPosts } from "@/gql/server";
 import type { Post } from "@/gql/types";
 import { getPlainText, getSubheader, NON_ROUTE_PAGE_SLUGS } from "@/lib/content";
@@ -9,6 +8,10 @@ import { routing } from "@/i18n/routing";
 import { PageHero } from "@/components/sections/PageHero";
 import { HubPageHero } from "@/components/sections/HubPageHero";
 import { CmsSectionHeading } from "@/components/sections/CmsSectionHeading";
+import { Section } from "@/components/sections/Section";
+import { Reveal } from "@/components/common/Reveal";
+import { RisingBlocks } from "@/components/common/RisingBlocks";
+import { MemberCarousel } from "@/components/members/MemberCarousel";
 import { EventCard } from "@/components/cards/EventCard";
 import { EducationCard } from "@/components/cards/EducationCard";
 import { InternationalCard } from "@/components/cards/InternationalCard";
@@ -65,34 +68,6 @@ export async function generateMetadata({
   };
 }
 
-function MemberRows({ posts, badge }: { posts: Post[]; badge: string }) {
-  return (
-    <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white">
-      {posts.map((post) => (
-        <div
-          key={post._id}
-          className="flex flex-col items-start gap-3 border-b border-neutral-100 px-4 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-6"
-        >
-          <div className="min-w-0">
-            <h3 className="line-clamp-2 text-sm font-semibold text-neutral-800 sm:truncate sm:text-base">
-              {post.title}
-            </h3>
-            {post.excerpt && (
-              <p className="mt-0.5 line-clamp-1 text-sm text-neutral-500">
-                {post.excerpt}
-              </p>
-            )}
-          </div>
-          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-accent-200 bg-accent-50 px-3 py-1 font-sans text-[11px] font-medium uppercase tracking-wide text-accent-700">
-            <Lock className="h-3 w-3" aria-hidden="true" />
-            {badge}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function HubContent({
   hub,
   posts,
@@ -104,14 +79,16 @@ function HubContent({
 }) {
   if (!hub || posts.length === 0) return null;
   if (hub === "members") {
-    return <MemberRows posts={posts} badge={memberBadge} />;
+    return <MemberCarousel posts={posts} badge={memberBadge} />;
   }
 
   if (hub === "international") {
     return (
-      <div className="grid gap-px overflow-hidden rounded-lg bg-primary-600 shadow-md sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {posts.map((post, index) => (
-          <InternationalCard key={post._id} post={post} index={index} />
+          <Reveal key={post._id} className="h-full" delay={(index % 4) * 80}>
+            <InternationalCard post={post} index={index} />
+          </Reveal>
         ))}
       </div>
     );
@@ -258,9 +235,11 @@ export default async function CmsPage({
           itemLabel={t(`pages.${hub}.collectionLabel`)}
           browseLabel={t(`pages.${hub}.browseLabel`)}
         />
-        <section
+        <Section
+          tone="light"
           id="page-content"
-          className="mx-auto max-w-[1200px] scroll-mt-24 px-4 pb-14 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:px-10"
+          className="scroll-mt-24"
+          containerClassName="py-14 sm:py-20"
         >
           <CmsSectionHeading slug={`${hub}-listing`} locale={locale} />
 
@@ -271,35 +250,44 @@ export default async function CmsPage({
               memberBadge={t("cards.memberOnly")}
             />
           ) : (
-            <p className="rounded-lg border border-neutral-200 bg-white px-6 py-10 text-sm text-neutral-500">
+            <p className="rounded-2xl border border-neutral-200 bg-white px-6 py-10 text-sm text-neutral-500">
               {t(`pages.${hub}.empty`)}
             </p>
           )}
+        </Section>
 
-          {hub === "international" && internationalNewsPosts.length > 0 && (
-            <div className="mt-16 border-t border-neutral-200 pt-14 sm:mt-20 sm:pt-16">
-              <CmsSectionHeading slug="international-news" locale={locale} />
-              <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+        {hub === "international" && internationalNewsPosts.length > 0 && (
+          <Section tone="dark" decor="high">
+            <CmsSectionHeading
+              slug="international-news"
+              locale={locale}
+              tone="dark"
+            />
+            <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+              <Reveal className="h-full">
                 <NewsCard
                   post={internationalNewsPosts[0]}
                   featured
                   hrefBase="/international"
                 />
-                {internationalNewsPosts.length > 1 && (
-                  <div className="rounded-lg border border-neutral-200 bg-white px-5 sm:px-6">
-                    {internationalNewsPosts.slice(1).map((post) => (
-                      <NewsCard
-                        key={post._id}
-                        post={post}
-                        hrefBase="/international"
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+              </Reveal>
+              {internationalNewsPosts.length > 1 && (
+                <Reveal
+                  delay={110}
+                  className="rounded-2xl border border-neutral-200 bg-white px-5 sm:px-6"
+                >
+                  {internationalNewsPosts.slice(1).map((post) => (
+                    <NewsCard
+                      key={post._id}
+                      post={post}
+                      hrefBase="/international"
+                    />
+                  ))}
+                </Reveal>
+              )}
             </div>
-          )}
-        </section>
+          </Section>
+        )}
       </>
     );
   }
@@ -311,7 +299,11 @@ export default async function CmsPage({
         eyebrow={getSubheader(page)}
         description={page.content}
       />
-      <div className="mx-auto max-w-[1200px] px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:px-10">
+      <Section
+        tone={hub === "members" ? "dark" : "light"}
+        containerClassName="py-12 sm:py-16"
+        backdrop={hub === "members" ? <RisingBlocks /> : undefined}
+      >
         <HubContent
           hub={hub}
           posts={posts}
@@ -323,7 +315,7 @@ export default async function CmsPage({
             <LeadForm />
           </div>
         )}
-      </div>
+      </Section>
     </>
   );
 }

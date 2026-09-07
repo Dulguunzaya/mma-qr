@@ -13,7 +13,7 @@ export function LanguageSwitcher({ locales }: { locales: readonly string[] }) {
 
   return (
     <div
-      className="flex items-center gap-1 text-xs font-sans"
+      className="flex items-center gap-1 font-sans text-[13px]"
       aria-label={t("language")}
     >
       {locales.map((l, i) => (
@@ -23,10 +23,10 @@ export function LanguageSwitcher({ locales }: { locales: readonly string[] }) {
             href={pathname}
             locale={l}
             className={cn(
-              "px-1 py-0.5 transition-colors",
+              "rounded-full px-1 py-0.5 transition-colors",
               l === locale
-                ? "font-semibold text-primary-700"
-                : "text-neutral-500 hover:text-primary-600"
+                ? "font-semibold text-primary-900"
+                : "text-neutral-400 hover:text-primary-700"
             )}
             aria-current={l === locale ? "page" : undefined}
           >

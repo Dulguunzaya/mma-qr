@@ -31,7 +31,7 @@ export function MobileNav({ entries }: { entries: NavEntry[] }) {
         aria-label={t("menu")}
         aria-expanded={isOpen}
         onClick={openMenu}
-        className="flex h-11 w-11 items-center justify-center rounded-md text-neutral-700 hover:bg-neutral-100"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-primary-900 transition-colors hover:bg-primary-50"
       >
         <Menu className="h-5 w-5" />
       </button>

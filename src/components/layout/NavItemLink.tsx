@@ -7,12 +7,14 @@ import { cn } from "@/lib/utils";
 type NavItemLinkProps = {
   item: MenuItem;
   className?: string;
+  activeClassName?: string;
   onClick?: () => void;
 };
 
 export function NavItemLink({
   item,
   className,
+  activeClassName = "border-b-2 border-accent-500 text-primary-800",
   onClick,
 }: NavItemLinkProps) {
   const href = item.url ?? "/";
@@ -46,10 +48,7 @@ export function NavItemLink({
     <Link
       href={href}
       aria-current={isActive ? "page" : undefined}
-      className={cn(
-        className,
-        isActive && "border-b-2 border-accent-500 text-primary-800"
-      )}
+      className={cn(className, isActive && activeClassName)}
       onClick={onClick}
     >
       {label}

@@ -2,6 +2,8 @@ import PostImage from "@/components/common/PostImage";
 import { getPageBySlug, getPosts } from "@/gql/server";
 import type { Post } from "@/gql/types";
 import { getSubheader } from "@/lib/content";
+import { Reveal } from "@/components/common/Reveal";
+import { Section } from "./Section";
 
 function getPostLink(post: Post): string | null {
   const content = post.content ?? "";
@@ -24,9 +26,12 @@ export default async function PartnerNetwork({ locale }: { locale: string }) {
   if (partners.length === 0) return null;
 
   return (
-    <section className="border-t border-neutral-200 bg-white">
-      <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-16 lg:px-10">
-        <div className="grid gap-8 lg:grid-cols-[220px_1fr] lg:items-center">
+    <Section
+      tone="mist"
+     
+      containerClassName="py-12 sm:py-16"
+    >
+        <Reveal className="grid gap-8 lg:grid-cols-[220px_1fr] lg:items-center">
           <div>
             <p className="flex items-center gap-3 font-sans text-xs font-medium uppercase tracking-[0.12em] text-accent-600">
               <span className="h-px w-8 bg-accent-500" aria-hidden="true" />
@@ -71,8 +76,7 @@ export default async function PartnerNetwork({ locale }: { locale: string }) {
               );
             })}
           </ul>
-        </div>
-      </div>
-    </section>
+        </Reveal>
+    </Section>
   );
 }
