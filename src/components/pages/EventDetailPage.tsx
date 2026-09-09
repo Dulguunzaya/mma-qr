@@ -107,10 +107,10 @@ function pickGroupField(
 }
 
 /** Only groups the CMS has given a code to survive in customFieldsMap. */
-function getSessionsFromMap(map: unknown): EventSession[] {
+function getSessionsFromMap(map: unknown): ParsedSession[] {
   if (!map || typeof map !== "object" || Array.isArray(map)) return [];
 
-  const sessions: EventSession[] = [];
+  const sessions: ParsedSession[] = [];
 
   for (const group of Object.values(map as Record<string, unknown>)) {
     if (!group || typeof group !== "object" || Array.isArray(group)) continue;
@@ -129,6 +129,7 @@ function getSessionsFromMap(map: unknown): EventSession[] {
       title: getString(pickGroupField(entry, ["title", "name", "heading"])),
       date,
       location,
+      writtenAt: 0,
     });
   }
 
@@ -200,7 +201,22 @@ function isLabelValue(value: unknown): value is string {
  * and at most those two labels, which is enough to tell where one day ends and
  * the next begins.
  */
-type FieldBucket = { date?: string; labels: string[] };
+type FieldBucket = { date?: string; labels: string[]; writtenAt: number };
+
+/** A day read out of the field list, with the time its group was written. */
+type ParsedSession = EventSession & { writtenAt: number };
+
+/**
+ * The CMS names every field it creates `field_<epoch-ms>`, so the largest id in
+ * a group says when that group was last written. Editing a group does not
+ * always retire the fields it replaces, and this is what tells an edited group
+ * from the copy left behind.
+ */
+function getFieldWrittenAt(field: unknown): number {
+  const match = typeof field === "string" ? /(\d{10,})/.exec(field) : null;
+
+  return match ? Number(match[1]) : 0;
+}
 
 function getEntryBuckets(data: unknown): FieldBucket[] {
   if (!Array.isArray(data)) return [];
@@ -208,7 +224,7 @@ function getEntryBuckets(data: unknown): FieldBucket[] {
   const buckets: FieldBucket[] = [];
   let current: FieldBucket | null = null;
 
-  for (const entry of data as Array<{ value?: unknown }>) {
+  for (const entry of data as Array<{ field?: unknown; value?: unknown }>) {
     const value = entry?.value;
     const date = isDateValue(value) ? String(value).trim() : undefined;
     const label = !date && isLabelValue(value) ? value.trim() : undefined;
@@ -220,9 +236,14 @@ function getEntryBuckets(data: unknown): FieldBucket[] {
       (label !== undefined && current.labels.length >= 2);
 
     if (startsNewGroup) {
-      current = { labels: [] };
+      current = { labels: [], writtenAt: 0 };
       buckets.push(current);
     }
+
+    current!.writtenAt = Math.max(
+      current!.writtenAt,
+      getFieldWrittenAt(entry?.field),
+    );
 
     if (date) current!.date = date;
     else if (label) current!.labels.push(label);
@@ -231,25 +252,63 @@ function getEntryBuckets(data: unknown): FieldBucket[] {
   return buckets;
 }
 
-function getSessionsFromEntries(data: unknown): EventSession[] {
+function getSessionsFromEntries(data: unknown): ParsedSession[] {
   // A day is only a day once it carries a date. Anything else the CMS holds
   // in the same field list — the ticket notes, say — is read separately.
-  const sessions = getEntryBuckets(data)
+  return getEntryBuckets(data)
     .filter((bucket) => bucket.date)
     .map((bucket) => ({
       title: bucket.labels[0],
       date: bucket.date,
       location: bucket.labels[1],
+      writtenAt: bucket.writtenAt,
     }));
+}
 
-  // A removed group can leave a duplicate day behind; show each one once.
-  const seen = new Set<string>();
-  return sessions.filter((session) => {
-    const key = `${session.title ?? ""}|${session.date ?? ""}|${session.location ?? ""}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+/**
+ * Mirrors the way the ticket card prints a session date, so two groups that
+ * would be shown as the same day are recognised as the same day here.
+ */
+function getSessionDayKey(session: EventSession): string {
+  const value = session.date?.trim();
+  if (!value) return "";
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ulaanbaatar",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(parsed);
+}
+
+/**
+ * Editing a day leaves the fields it replaced on the post, so the same day can
+ * arrive twice — once as it was, once as it was edited. Each day is listed
+ * once, keeping the group written last. A group carrying no date is left
+ * alone: nothing marks it as a day to begin with.
+ */
+function dropSupersededSessions(sessions: ParsedSession[]): EventSession[] {
+  const latestByDay = new Map<string, ParsedSession>();
+
+  for (const session of sessions) {
+    const key = getSessionDayKey(session);
+    if (!key) continue;
+
+    const held = latestByDay.get(key);
+    if (!held || session.writtenAt >= held.writtenAt) {
+      latestByDay.set(key, session);
+    }
+  }
+
+  return sessions
+    .filter((session) => {
+      const key = getSessionDayKey(session);
+      return !key || latestByDay.get(key) === session;
+    })
+    .map(({ title, date, location }) => ({ title, date, location }));
 }
 
 /**
@@ -258,9 +317,12 @@ function getSessionsFromEntries(data: unknown): EventSession[] {
  * out is the note list, in the order the CMS shows it.
  */
 function getTicketNotes(post: Post): string[] {
-  return getEntryBuckets(post.customFieldsData)
+  const notes = getEntryBuckets(post.customFieldsData)
     .filter((bucket) => !bucket.date)
     .flatMap((bucket) => bucket.labels);
+
+  // The leftover fields that duplicate a day duplicate a note just as easily.
+  return [...new Set(notes)];
 }
 
 /** Cyrillic anywhere in a label marks the Mongolian wording of a day. */
@@ -273,12 +335,13 @@ function isCyrillic(text: string | undefined): boolean {
  * same groups. A day written up twice — once in Mongolian, once in English —
  * therefore arrives as two groups sharing one date. Keep the wording that
  * matches the language being read, and leave a date alone when only one
- * wording exists or when the day genuinely holds several sessions.
+ * wording exists. Whatever still shares a date afterwards is a leftover copy
+ * of that day, which dropSupersededSessions settles.
  */
-function pickSessionsForLocale(
-  sessions: EventSession[],
+function pickSessionsForLocale<T extends EventSession>(
+  sessions: T[],
   locale: string,
-): EventSession[] {
+): T[] {
   const wantsCyrillic = locale === "mn";
   const matchesLocale = (session: EventSession) =>
     isCyrillic(session.title) || isCyrillic(session.location)
@@ -306,7 +369,7 @@ function getEventSessions(post: Post, locale: string): EventSession[] {
       ? fromEntries
       : getSessionsFromMap(post.customFieldsMap);
 
-  return pickSessionsForLocale(sessions, locale);
+  return dropSupersededSessions(pickSessionsForLocale(sessions, locale));
 }
 
 export default async function EventDetailPage({
