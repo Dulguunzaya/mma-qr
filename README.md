@@ -25,3 +25,4 @@ The Mongolian site is available at `/mn` and the English site at `/en`.
 - `src/gql` — GraphQL documents, request handling and server CMS functions
 - `src/hooks` — reusable client-side behavior
 - `messages` — Mongolian and English translations
+# mma-qr
